@@ -5,117 +5,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>VisTacAlign</title>
 <meta name="description" content="Co-Training Dexterous Policies on Tactile Human and Robot Demonstrations">
-<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖐️</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --ink:#111; --body:#2b2b2b; --muted:#6b6b6b; --rule:#e4e4e4;
-    --blue:#2d6cdf; --green:#1fa15a; --cardinal:#c51d38; --wash:#fafafa;
-    --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
-    --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --bg:#ffffff; --text:#1d1d1f; --text2:#86868b;
+    --accent:#0071e3; --accent-hover:#0077ed;
+    --card:#f5f5f7; --border:#d2d2d7;
+    --gold:#c5960c; --red:#ff3b30; --red2:#e51a1a; --green:#1fa15a;
+    --sans:-apple-system,BlinkMacSystemFont,'SF Pro Display','Lato','Helvetica Neue',sans-serif;
+    --mono:'SF Mono','Fira Code','Consolas',monospace;
+    --fast:.3s ease;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#000000; --text:#f5f5f7; --text2:#a1a1a6;
+      --accent:#2997ff; --accent-hover:#64b5f6;
+      --card:#1c1c1e; --border:#38383a; --green:#30d158;
+    }
   }
   *{box-sizing:border-box}
-  html{scroll-behavior:smooth; scroll-padding-top:64px}
-  body{margin:0; background:#fff; color:var(--body);
-       font-family:var(--sans); font-size:17px; line-height:1.65;
-       -webkit-font-smoothing:antialiased}
+  html{scroll-behavior:smooth; scroll-padding-top:60px}
+  body{margin:0; background:var(--bg); color:var(--text);
+       font-family:var(--sans); font-size:17px; font-weight:400; line-height:1.65;
+       -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
 
-  /* ---------- nav ---------- */
-  nav{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.93);
-      backdrop-filter:saturate(180%) blur(10px);
-      border-bottom:1px solid var(--rule)}
-  nav .inner{max-width:900px; margin:0 auto; padding:11px 20px;
-             display:flex; gap:22px; flex-wrap:wrap; align-items:center}
-  nav .brand{font-family:var(--serif); font-weight:600; color:var(--ink);
-             letter-spacing:.2px; margin-right:auto}
-  nav a{color:var(--muted); text-decoration:none; font-size:14.5px}
-  nav a:hover{color:var(--ink)}
-
-  /* ---------- layout ---------- */
-  .wrap{max-width:900px; margin:0 auto; padding:0 20px}
-  header{text-align:center; padding:56px 0 8px}
-  h1{font-family:var(--serif); font-weight:600; color:var(--ink);
-     font-size:clamp(28px,4.6vw,42px); line-height:1.2; margin:0 0 6px;
-     letter-spacing:-.4px}
-  .sub{font-family:var(--serif); font-size:clamp(17px,2.3vw,21px);
-       color:#444; margin:0 0 26px; font-style:italic}
-  .authors{font-size:16px; color:var(--ink); margin:0 0 4px}
-  .venue{font-size:15px; color:var(--muted); margin:0 0 22px}
-
-  .links{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:8px}
-  .links a, .links span{display:inline-block; padding:7px 15px;
-        border:1px solid #d7d7d7; border-radius:999px; font-size:14.5px;
-        text-decoration:none; color:var(--ink); background:#fff}
-  .links a:hover{border-color:var(--ink); background:var(--wash)}
-  .links span{color:#9a9a9a; border-style:dashed}
-
-  section{padding:34px 0 6px}
-  h2{font-family:var(--serif); font-weight:600; color:var(--ink);
-     font-size:clamp(21px,3vw,27px); margin:0 0 4px; letter-spacing:-.2px}
-  h2 + .rule{height:1px; background:var(--rule); margin:0 0 18px}
-  h3{font-family:var(--serif); font-weight:600; color:var(--ink);
-     font-size:19px; margin:26px 0 6px}
-  p{margin:0 0 15px}
-  a{color:var(--blue)}
-
-  figure{margin:22px 0 8px}
-  figure img{width:100%; height:auto; display:block; border-radius:3px}
-  figcaption{font-size:14.5px; color:var(--muted); margin-top:9px; line-height:1.55}
-  figcaption b{color:var(--ink); font-weight:600}
-
-  .lead{font-size:18.5px; color:#333}
-  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.92em;
-       background:var(--wash); border:1px solid var(--rule); border-radius:4px; padding:1px 5px}
-
-  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin:20px 0}
-  .card{border:1px solid var(--rule); border-radius:7px; padding:15px 16px; background:#fff}
-  .card .n{font-family:var(--serif); font-size:13px; color:var(--muted);
-           text-transform:uppercase; letter-spacing:.09em; margin-bottom:5px}
-  .card .t{font-weight:600; color:var(--ink); margin-bottom:5px}
-  .card p{font-size:15px; margin:0; color:#4a4a4a}
-
-  .tablewrap{overflow-x:auto; margin:18px 0}
-  table{border-collapse:collapse; width:100%; font-size:15px; min-width:430px}
-  th,td{padding:8px 11px; text-align:left; border-bottom:1px solid var(--rule)}
-  th{font-family:var(--serif); font-weight:600; color:var(--ink);
-     border-bottom:1.5px solid #c9c9c9; white-space:nowrap}
-  td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
-  tr.best td{background:#f5faf6}
-  tr.best td.num{font-weight:600; color:var(--green)}
-  caption{caption-side:bottom; text-align:left; font-size:14px;
-          color:var(--muted); padding-top:9px}
-
-  .pull{border-left:3px solid var(--cardinal); padding:3px 0 3px 16px;
-        margin:22px 0; color:var(--ink); font-family:var(--serif);
-        font-size:18.5px; line-height:1.55}
-
-  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-         gap:12px; margin:20px 0}
-  .stat{border:1px solid var(--rule); border-radius:7px; padding:14px; text-align:center}
-  .stat .v{font-family:var(--serif); font-size:26px; color:var(--ink); line-height:1.1}
-  .stat .v small{font-size:15px; color:var(--muted)}
-  .stat .l{font-size:13.5px; color:var(--muted); margin-top:5px; line-height:1.4}
-
-  details{border-top:1px solid var(--rule); padding:13px 0}
-  details:last-of-type{border-bottom:1px solid var(--rule)}
-  summary{cursor:pointer; font-weight:600; color:var(--ink); list-style:none;
-          display:flex; gap:10px; align-items:flex-start}
-  summary::-webkit-details-marker{display:none}
-  summary::before{content:"+"; color:var(--muted); font-weight:400; flex:none}
-  details[open] summary::before{content:"–"}
-  details p{margin:10px 0 2px; padding-left:20px; font-size:16px}
-
-  footer{border-top:1px solid var(--rule); margin-top:46px; padding:22px 0 44px;
-         font-size:14px; color:var(--muted); text-align:center}
-
-  .c-blue{color:var(--blue); font-weight:600}
-  .c-green{color:var(--green); font-weight:600}
-  .c-red{color:var(--cardinal); font-weight:600}
-
-  @media (max-width:600px){
-    body{font-size:16px}
-    header{padding:36px 0 4px}
-    nav .inner{gap:14px}
+  nav{position:sticky; top:0; z-index:50; background:var(--bg);
+      border-bottom:1px solid var(--border)}
+  @supports (backdrop-filter:blur(1px)){
+    nav{background:color-mix(in srgb, var(--bg) 82%, transparent);
+        backdrop-filter:saturate(180%) blur(20px);
+        -webkit-backdrop-filter:saturate(180%) blur(20px)}
   }
+  nav .inner{max-width:1280px; margin:0 auto; padding:0 clamp(20px,5vw,40px);
+             height:48px; display:flex; gap:26px; align-items:center; overflow-x:auto}
+  nav .brand{font-weight:700; color:var(--text); letter-spacing:-.2px;
+             margin-right:auto; white-space:nowrap}
+  nav a{color:var(--text2); text-decoration:none; font-size:14px; white-space:nowrap;
+        transition:color var(--fast)}
+  nav a:hover{color:var(--text)}
+
+  .wrap{max-width:1280px; margin:0 auto; padding:0 clamp(20px,5vw,40px)}
+  .prose{max-width:760px}
+  header{text-align:center; padding:clamp(56px,9vh,96px) 0 8px}
+  h1{font-weight:700; letter-spacing:-.02em; line-height:1.15; margin:0 0 10px;
+     font-size:clamp(2rem,5vw,3.2rem)}
+  .sub{font-size:clamp(1.05rem,2.2vw,1.45rem); font-weight:400; line-height:1.3;
+       color:var(--text); margin:0 auto 26px; max-width:860px}
+  .authors{font-size:17px; color:var(--text); margin:0 0 6px}
+  .venue{font-size:15px; color:var(--gold); font-weight:700;
+         letter-spacing:.02em; margin:0 0 24px}
+
+  .pub-links{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
+  .pub-links a, .pub-links span{display:inline-block; padding:7px 16px;
+        border-radius:980px; border:1px solid var(--accent); color:var(--accent);
+        font-size:15px; text-decoration:none; transition:all var(--fast)}
+  .pub-links a:hover{background:var(--accent); color:#fff}
+  .pub-links span{border-color:var(--border); color:var(--text2)}
+
+  section{padding:clamp(56px,8vh,96px) 0 0}
+  h2{font-weight:700; letter-spacing:-.02em; line-height:1.15;
+     font-size:clamp(1.6rem,3.4vw,2.4rem); margin:0 0 6px}
+  h2 + .rule{height:1px; background:var(--border); margin:0 0 22px}
+  h3{font-weight:700; font-size:1.2rem; line-height:1.3; margin:34px 0 8px}
+  p{margin:0 0 16px}
+  a{color:var(--accent)}
+  a:hover{color:var(--accent-hover)}
+
+  figure{margin:26px 0 8px}
+  figure img{width:100%; height:auto; display:block; border-radius:12px;
+             border:1px solid var(--border); background:#fff}
+  figcaption{font-size:15px; color:var(--text2); margin-top:12px; line-height:1.55;
+             max-width:900px}
+  figcaption b{color:var(--text); font-weight:700}
+
+  .lead{font-size:19px}
+  .kbd{font-family:var(--mono); font-size:.88em; background:var(--card);
+       border:1px solid var(--border); border-radius:6px; padding:2px 6px}
+
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+         gap:16px; margin:26px 0}
+  .card{background:var(--card); border-radius:16px; padding:20px 22px}
+  .card .n{font-size:12px; color:var(--text2); text-transform:uppercase;
+           letter-spacing:.08em; font-weight:700; margin-bottom:6px}
+  .card .t{font-weight:700; color:var(--text); margin-bottom:6px; font-size:17px}
+  .card p{font-size:15px; margin:0; color:var(--text2); line-height:1.55}
+
+  .tablewrap{overflow-x:auto; margin:22px 0; -webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse; width:100%; font-size:15px; min-width:440px}
+  th,td{padding:10px 14px; text-align:left; border-bottom:1px solid var(--border)}
+  th{font-weight:700; color:var(--text); white-space:nowrap;
+     border-bottom:1.5px solid var(--text2)}
+  td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
+  tr.best td{background:var(--card)}
+  tr.best td.num{font-weight:700; color:var(--green)}
+  caption{caption-side:bottom; text-align:left; font-size:14px;
+          color:var(--text2); padding-top:12px; line-height:1.5}
+
+  .pull{border-left:3px solid var(--accent); padding:4px 0 4px 20px;
+        margin:28px 0; color:var(--text); font-size:20px; line-height:1.5; max-width:800px}
+
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+         gap:16px; margin:28px 0}
+  .stat{background:var(--card); border-radius:16px; padding:22px 16px; text-align:center}
+  .stat .v{font-size:30px; font-weight:700; letter-spacing:-.02em; line-height:1.1}
+  .stat .v small{font-size:16px; font-weight:400; color:var(--text2)}
+  .stat .l{font-size:14px; color:var(--text2); margin-top:8px; line-height:1.45}
+
+  details{border-top:1px solid var(--border); padding:16px 0}
+  details:last-of-type{border-bottom:1px solid var(--border)}
+  summary{cursor:pointer; font-weight:700; color:var(--text); list-style:none;
+          display:flex; gap:12px; align-items:flex-start; transition:color var(--fast)}
+  summary:hover{color:var(--accent)}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"+"; color:var(--text2); font-weight:400; flex:none}
+  details[open] summary::before{content:"-"}
+  details p{margin:12px 0 2px; padding-left:24px; font-size:16px; color:var(--text2)}
+
+  footer{border-top:1px solid var(--border); margin-top:clamp(56px,8vh,96px);
+         padding:28px 0 56px; font-size:14px; color:var(--text2); text-align:center}
+
+  .c-blue{color:var(--accent); font-weight:700}
+  .c-green{color:var(--green); font-weight:700}
+  .c-red{color:var(--red2); font-weight:700}
+
+  @media (max-width:600px){ body{font-size:16px} nav .inner{gap:18px} }
 </style>
 </head>
 <body>
@@ -137,7 +152,7 @@
   <p class="sub">Co-Training Dexterous Policies on Tactile Human and Robot Demonstrations</p>
   <p class="authors">Anonymous Authors</p>
   <p class="venue">Under review, ICRA 2027</p>
-  <div class="links">
+  <div class="pub-links">
     <span>Paper &middot; coming soon</span>
     <span>Code &middot; coming soon</span>
   </div>
@@ -155,18 +170,18 @@
 
 <section id="overview">
   <h2>Overview</h2><div class="rule"></div>
-  <p class="lead">Human demonstrations are a cheap source of data for dexterous manipulation. But co-training a
+  <p class="lead prose">Human demonstrations are a cheap source of data for dexterous manipulation. But co-training a
   robot policy on them requires closing the human&ndash;robot gap in <em>every</em> modality the policy consumes,
   not just vision.</p>
 
-  <p>VisTacAlign closes that gap in three places at once. Glove-tracked hand motion is retargeted to a 17-DoF
+  <p class="prose">VisTacAlign closes that gap in three places at once. Glove-tracked hand motion is retargeted to a 17-DoF
   tactile robot hand with a one-time fingertip correction. The human hand is erased from both stereo views and
   replaced by a posed robot-hand mesh painted with pixels from robot recordings, and a real-time stereo
   foundation model is re-run on the composite, so human point clouds carry the same stereo errors and visibility
   as robot clouds. A capacitive tactile glove is aligned to the robot's fingertip sensors in its own signal
   space, giving one interpretable per-finger force representation.</p>
 
-  <p>A diffusion transformer consumes point-cloud, proprioceptive and per-finger tactile tokens. On three
+  <p class="prose">A diffusion transformer consumes point-cloud, proprioceptive and per-finger tactile tokens. On three
   real-world tasks that require precise force, adding aligned human demonstrations to existing robot data
   improves over robot-only policies.</p>
 
@@ -186,21 +201,21 @@
 
 <section id="method">
   <h2>How does VisTacAlign work?</h2><div class="rule"></div>
-  <p>The framework has four components. The first three erase a different part of the embodiment gap. The fourth
+  <p class="prose">The framework has four components. The first three erase a different part of the embodiment gap. The fourth
   consumes the result.</p>
 
   <div class="cards">
     <div class="card"><div class="n">Component 1</div><div class="t">Kinematic retargeting</div>
-      <p>Glove hand poses mapped to the robot hand, with a learned fingertip correction calibrated once against
+      <p class="prose">Glove hand poses mapped to the robot hand, with a learned fingertip correction calibrated once against
       a headset as pseudo ground truth.</p></div>
     <div class="card"><div class="n">Component 2</div><div class="t">Tactile alignment</div>
-      <p>A static map carries human glove forces into the robot's own taxel units, fitted from unpaired
+      <p class="prose">A static map carries human glove forces into the robot's own taxel units, fitted from unpaired
       demonstrations.</p></div>
     <div class="card"><div class="n">Component 3</div><div class="t">Visual alignment (Rp2d)</div>
-      <p>The human hand is removed and a robot-textured mesh is composited back into both stereo views, then
+      <p class="prose">The human hand is removed and a robot-textured mesh is composited back into both stereo views, then
       stereo is re-run.</p></div>
     <div class="card"><div class="n">Component 4</div><div class="t">3D-tactile transformer</div>
-      <p>A 23.5M-parameter policy over point-cloud, proprioceptive and tactile tokens, trained with consistency
+      <p class="prose">A 23.5M-parameter policy over point-cloud, proprioceptive and tactile tokens, trained with consistency
       flow matching.</p></div>
   </div>
 
@@ -215,7 +230,7 @@
   </figure>
 
   <h3>Fixing the fingertips first</h3>
-  <p>Motion-capture gloves report fingertip positions with centimetre errors in pinch grasps, caused by hand-size
+  <p class="prose">Motion-capture gloves report fingertip positions with centimetre errors in pinch grasps, caused by hand-size
   variation and the glove's assumed skeleton. On a real robot that is the difference between a grasp and a miss.
   We calibrate once against a headset's hand tracker, fitting a small network that nudges each joint by at most
   20&deg; while keeping bone lengths fixed.</p>
@@ -241,17 +256,17 @@
 
 <section id="touch">
   <h2>How do we align touch?</h2><div class="rule"></div>
-  <p>The two sensors have nothing in common. The human wears a capacitive glove with 202 normal-force taxels at
+  <p class="prose">The two sensors have nothing in common. The human wears a capacitive glove with 202 normal-force taxels at
   60&nbsp;Hz. The robot has Hall-effect fingertip arrays with 363 three-axis taxels. They differ in layout, gain,
   saturation and contact geometry. A policy trained on the naively pooled data would see two unrelated force
   scales and could not exploit touch at all.</p>
 
-  <p>Both sides are first reduced to one scalar per fingertip. We then fit a static map that carries the human
+  <p class="prose">Both sides are first reduced to one scalar per fingertip. We then fit a static map that carries the human
   distribution onto the robot's, matching both the total load and how that load is shared between fingers. It is
   fitted once per task from unpaired frames, has a single hyperparameter, and is applied to the human dataset
   when it is built. Robot data and the deployed policy are never transformed.</p>
 
-  <p>Because every output is an average of robot samples, the mapped signal is still a force in the robot's own
+  <p class="prose">Because every output is an average of robot samples, the mapped signal is still a force in the robot's own
   taxel units. It maps the absence of contact to zero and can never leave the robot's force range.</p>
 
   <figure>
@@ -265,7 +280,7 @@
   </figure>
 
   <h3>Does the alignment actually work?</h3>
-  <p>We check it directly against the robot distribution with standard two-sample statistics, on held-out
+  <p class="prose">We check it directly against the robot distribution with standard two-sample statistics, on held-out
   episodes with the map refitted per fold. This is possible precisely <em>because</em> the alignment lives in
   signal space rather than a learned latent space.</p>
 
@@ -284,11 +299,11 @@
 
 <section id="vision">
   <h2>How do we align vision?</h2><div class="rule"></div>
-  <p>Depth alone does not close the gap between the two sources. The robot hand is anthropomorphic, but it still
+  <p class="prose">Depth alone does not close the gap between the two sources. The robot hand is anthropomorphic, but it still
   differs from a gloved human hand in size, shape and colour. So we align the human demonstrations to the robot's
   appearance in 3D before training, and the policy sees the same hand at training time and at deployment.</p>
 
-  <p>Both streams are observed by the same stereo camera and lifted with a real-time stereo foundation model.
+  <p class="prose">Both streams are observed by the same stereo camera and lifted with a real-time stereo foundation model.
   For human demonstrations, every pixel outside the task masks is blanked, including the hand and arm. The robot
   hand mesh is posed at the tracked wrist, painted with real pixels sampled from robot recordings, composited
   back into <em>both</em> stereo views, and stereo is run a second time on the composite.</p>
@@ -305,7 +320,7 @@
   </figure>
 
   <h3>Is the composited hand actually measured?</h3>
-  <p>Yes, and it is measurable. Mesh points inserted straight into a real cloud stay separable from sensed points
+  <p class="prose">Yes, and it is measurable. Mesh points inserted straight into a real cloud stay separable from sensed points
   by their surface roughness, because they carry no sensor noise. After the second stereo pass, that signature is
   nearly gone.</p>
 
@@ -334,13 +349,13 @@
 
 <section id="results">
   <h2>How well does it work?</h2><div class="rule"></div>
-  <p>Three real-world tasks, each chosen because success depends on force rather than motion alone. A
+  <p class="prose">Three real-world tasks, each chosen because success depends on force rather than motion alone. A
   configuration such as <span class="kbd">26H10R</span> means 26 human and 10 robot demonstrations. Human
   demonstrations are roughly two to three times faster to collect and need no robot at all, only the glove, the
   wrist tracker and a stereo camera.</p>
 
   <h3>Drill: human data helps, but only with touch</h3>
-  <p>The robot must approach a power drill, activate its trigger, and lift it while keeping the trigger held.
+  <p class="prose">The robot must approach a power drill, activate its trigger, and lift it while keeping the trigger held.
   Every robot demonstration carries tactile data, so even the robot-only policy sees force.</p>
 
   <div class="tablewrap">
@@ -361,13 +376,13 @@
   </table>
   </div>
 
-  <p>The comparison that matters is the last three rows. Starting from 10 robot demonstrations, adding 26
+  <p class="prose">The comparison that matters is the last three rows. Starting from 10 robot demonstrations, adding 26
   <em>touchless</em> human demonstrations drops success from 35% to 30%. Adding the same demonstrations with
   aligned tactile raises it to 55%. Since <span class="kbd">26H10R</span> and <span class="kbd">26R</span> cost
   about the same to collect, the aligned human data is the better use of that time.</p>
 
   <h3>Strawberry: touch regulates force</h3>
-  <p>The robot must pluck a strawberry held by a magnet, which takes enough force to overcome the magnet without
+  <p class="prose">The robot must pluck a strawberry held by a magnet, which takes enough force to overcome the magnet without
   crushing the fruit. Here we co-train on 124 human and 84 robot demonstrations.</p>
 
   <figure>
@@ -391,7 +406,7 @@
   </div>
 
   <h3>Lego: the recipe scales</h3>
-  <p>The robot must pick up a brick, align it over a base plate, push until it snaps in, and retreat. This task
+  <p class="prose">The robot must pick up a brick, align it over a base plate, push until it snaps in, and retreat. This task
   also isolates the visual alignment: <em>No Rp2d</em> feeds the raw human point cloud instead of the composited
   one.</p>
 
@@ -414,7 +429,7 @@
   </table>
   </div>
 
-  <p>Final success grows with the number of robot demonstrations, from 40% with 10 to 60% with 20 and 80% with
+  <p class="prose">Final success grows with the number of robot demonstrations, from 40% with 10 to 60% with 20 and 80% with
   30, against 10% for 30 robot demonstrations alone. Human demonstrations do not replace robot data. They improve
   what a few robot demonstrations are worth. Without the visual alignment the policy still picks up the brick,
   but success collapses at the push and retreat stages, where contact matters most.</p>
@@ -435,38 +450,38 @@
   <h2>Q&amp;A</h2><div class="rule"></div>
 
   <details><summary>Why align in signal space instead of a learned latent space?</summary>
-  <p>Three reasons. The aligned quantity is still a per-finger force in the robot's units, so it can be checked
+  <p class="prose">Three reasons. The aligned quantity is still a per-finger force in the robot's units, so it can be checked
   directly against the robot distribution with standard statistics, which is exactly what the tables above do.
   The map is fitted once and deterministically from a few thousand unpaired frames, with one hyperparameter and
   no encoder to train. And because it is static and acts frame by frame, it cannot shift the timing of contact
   events.</p>
-  <p>We do not compare head-to-head against a learned latent alignment. Our case rests on interpretability and on
+  <p class="prose">We do not compare head-to-head against a learned latent alignment. Our case rests on interpretability and on
   guarantees that hold by construction, and quantifying that trade-off is the most immediate item of future
   work.</p></details>
 
   <details><summary>Why re-run stereo instead of just pasting the robot hand into the cloud?</summary>
-  <p>Because a pasted mesh is not a measurement. Its points are noise-free, uniformly dense, and cover surfaces a
+  <p class="prose">Because a pasted mesh is not a measurement. Its points are noise-free, uniformly dense, and cover surfaces a
   single-view sensor could never see. A simple roughness test separates them from real sensed points almost
   perfectly, at 0.99 area under the curve, which means a policy can learn that shortcut too. Running stereo on
   the composite drops that to 0.67&ndash;0.76.</p></details>
 
   <details><summary>Do you still need robot demonstrations?</summary>
-  <p>Yes. The tactile map is fitted per task from unpaired force samples, so a short robot recording of the
+  <p class="prose">Yes. The tactile map is fitted per task from unpaired force samples, so a short robot recording of the
   task's contacts is still needed. The result is not that human data replaces robot data, but that it
   substantially raises what a small number of robot demonstrations is worth.</p></details>
 
   <details><summary>What are the main limitations?</summary>
-  <p>The tactile map is fitted per task. Reducing a fingertip to one normal force discards the taxel layout and
+  <p class="prose">The tactile map is fitted per task. Reducing a fingertip to one normal force discards the taxel layout and
   shear, which likely matters for in-hand manipulation and slip. The tasks are short-horizon and largely
   quasi-static. And we do not compare against alignment in a learned latent space.</p></details>
 
   <details><summary>How fast does the policy run?</summary>
-  <p>The policy has 23.5M parameters. At deployment, stereo runs at 20&nbsp;Hz, the glove at 60&nbsp;Hz and the
+  <p class="prose">The policy has 23.5M parameters. At deployment, stereo runs at 20&nbsp;Hz, the glove at 60&nbsp;Hz and the
   robot taxels at 30&nbsp;Hz. We sample 10 flow steps and execute the first 32 of a 64-step chunk, about 1.1
   seconds, before replanning, which takes 269&nbsp;ms on a consumer GPU.</p></details>
 
   <details><summary>Does the aligned human data change how hard the robot grips?</summary>
-  <p>That is the clearest single effect. On the strawberry task the robot-only policy under-grips small fruit and
+  <p class="prose">That is the clearest single effect. On the strawberry task the robot-only policy under-grips small fruit and
   over-grips large fruit, and never plucks the largest size. The co-trained policy holds a narrow force band
   across all three sizes and succeeds on every one. Grasp force is precisely the quantity the tactile alignment
   transfers from the human hand.</p></details>
