@@ -74,10 +74,27 @@
   a:hover{color:var(--accent-hover)}
 
   figure{margin:26px 0 8px}
-  figure img{width:100%; height:auto; display:block; border-radius:12px;
+  figure{max-width:920px; margin-left:auto; margin-right:auto}
+  figure img, figure video{width:100%; height:auto; display:block; border-radius:12px;
              border:1px solid var(--border); background:#fff}
-  figure.narrow{max-width:620px}
+  figure.narrow{max-width:600px}
   figure.narrow img{padding:14px}
+  figure.tall{max-width:560px}
+
+  /* rollout grid, ready for video assets */
+  .rollouts{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+            gap:20px; margin:26px 0}
+  .rollout{background:var(--card); border-radius:16px; overflow:hidden}
+  .rollout video{border-radius:0; border:0; background:#000; aspect-ratio:16/9;
+                 object-fit:cover}
+  .rollout .meta{padding:13px 16px}
+  .rollout .meta .t{font-weight:700; font-size:16px; margin-bottom:3px}
+  .rollout .meta .d{font-size:14px; color:var(--text2); line-height:1.5}
+  .tag{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.04em;
+       padding:2px 8px; border-radius:980px; vertical-align:2px; margin-left:7px}
+  .tag.ok{background:rgba(31,161,90,.14); color:var(--green)}
+  .tag.fail{background:rgba(229,26,26,.13); color:var(--red2)}
+  .tag.speed{background:var(--card); color:var(--text2); border:1px solid var(--border)}
   figcaption{font-size:15px; color:var(--text2); margin-top:12px; line-height:1.55;
              max-width:900px}
   figcaption b{color:var(--text); font-weight:700}
@@ -160,7 +177,7 @@
   </div>
 </header>
 
-<figure>
+<figure class="tall">
   <img src="static/images/splash.jpg" alt="Human demonstrations with a tactile glove and robot demonstrations on a tactile robot hand are brought into a shared representation, then deployed on the robot.">
   <figcaption><b>Tactile co-training for dexterous manipulation.</b> Human demonstrations collected with a
   capacitive tactile glove (<span class="c-blue">blue</span>) and robot demonstrations collected on a tactile
@@ -436,6 +453,34 @@
   what a few robot demonstrations are worth. Without the visual alignment the policy still picks up the brick,
   but success collapses at the push and retreat stages, where contact matters most.</p>
 </section>
+
+
+<!-- ===================== ROLLOUTS =====================
+     Drop clips into static/videos/ and uncomment. Encode with:
+       ffmpeg -i IN.MOV -vf "scale=1280:-2" -c:v libx264 -preset slow -crf 26 \
+              -pix_fmt yuv420p -movflags +faststart -an OUT.mp4
+
+<section id="rollouts">
+  <h2>Rollouts</h2><div class="rule"></div>
+  <p class="prose">Real-world rollouts of the co-trained policy, played at 3x.</p>
+  <div class="rollouts">
+    <div class="rollout">
+      <video src="static/videos/drill_ours.mp4" autoplay loop muted playsinline></video>
+      <div class="meta">
+        <div class="t">Drill<span class="tag ok">70% lift</span><span class="tag speed">3x</span></div>
+        <div class="d">Co-trained with aligned human demonstrations.</div>
+      </div>
+    </div>
+    <div class="rollout">
+      <video src="static/videos/drill_robot_only.mp4" autoplay loop muted playsinline></video>
+      <div class="meta">
+        <div class="t">Drill<span class="tag fail">50% lift</span><span class="tag speed">3x</span></div>
+        <div class="d">Robot-only baseline, point-cloud observations.</div>
+      </div>
+    </div>
+  </div>
+</section>
+====================================================== -->
 
 <section id="hardware">
   <h2>Hardware</h2><div class="rule"></div>
