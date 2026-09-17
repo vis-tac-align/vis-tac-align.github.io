@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VisTacAlign</title>
+<meta name="description" content="Co-Training Dexterous Policies on Tactile Human and Robot Demonstrations">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🖐️</text></svg>">
+<style>
+  :root{
+    --ink:#111; --body:#2b2b2b; --muted:#6b6b6b; --rule:#e4e4e4;
+    --blue:#2d6cdf; --green:#1fa15a; --cardinal:#c51d38; --wash:#fafafa;
+    --serif: "Iowan Old Style","Palatino Linotype",Palatino,Georgia,"Times New Roman",serif;
+    --sans: -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth; scroll-padding-top:64px}
+  body{margin:0; background:#fff; color:var(--body);
+       font-family:var(--sans); font-size:17px; line-height:1.65;
+       -webkit-font-smoothing:antialiased}
+
+  /* ---------- nav ---------- */
+  nav{position:sticky; top:0; z-index:50; background:rgba(255,255,255,.93);
+      backdrop-filter:saturate(180%) blur(10px);
+      border-bottom:1px solid var(--rule)}
+  nav .inner{max-width:900px; margin:0 auto; padding:11px 20px;
+             display:flex; gap:22px; flex-wrap:wrap; align-items:center}
+  nav .brand{font-family:var(--serif); font-weight:600; color:var(--ink);
+             letter-spacing:.2px; margin-right:auto}
+  nav a{color:var(--muted); text-decoration:none; font-size:14.5px}
+  nav a:hover{color:var(--ink)}
+
+  /* ---------- layout ---------- */
+  .wrap{max-width:900px; margin:0 auto; padding:0 20px}
+  header{text-align:center; padding:56px 0 8px}
+  h1{font-family:var(--serif); font-weight:600; color:var(--ink);
+     font-size:clamp(28px,4.6vw,42px); line-height:1.2; margin:0 0 6px;
+     letter-spacing:-.4px}
+  .sub{font-family:var(--serif); font-size:clamp(17px,2.3vw,21px);
+       color:#444; margin:0 0 26px; font-style:italic}
+  .authors{font-size:16px; color:var(--ink); margin:0 0 4px}
+  .venue{font-size:15px; color:var(--muted); margin:0 0 22px}
+
+  .links{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; margin-bottom:8px}
+  .links a, .links span{display:inline-block; padding:7px 15px;
+        border:1px solid #d7d7d7; border-radius:999px; font-size:14.5px;
+        text-decoration:none; color:var(--ink); background:#fff}
+  .links a:hover{border-color:var(--ink); background:var(--wash)}
+  .links span{color:#9a9a9a; border-style:dashed}
+
+  section{padding:34px 0 6px}
+  h2{font-family:var(--serif); font-weight:600; color:var(--ink);
+     font-size:clamp(21px,3vw,27px); margin:0 0 4px; letter-spacing:-.2px}
+  h2 + .rule{height:1px; background:var(--rule); margin:0 0 18px}
+  h3{font-family:var(--serif); font-weight:600; color:var(--ink);
+     font-size:19px; margin:26px 0 6px}
+  p{margin:0 0 15px}
+  a{color:var(--blue)}
+
+  figure{margin:22px 0 8px}
+  figure img{width:100%; height:auto; display:block; border-radius:3px}
+  figcaption{font-size:14.5px; color:var(--muted); margin-top:9px; line-height:1.55}
+  figcaption b{color:var(--ink); font-weight:600}
+
+  .lead{font-size:18.5px; color:#333}
+  .kbd{font-family:ui-monospace,SFMono-Regular,Menlo,monospace; font-size:.92em;
+       background:var(--wash); border:1px solid var(--rule); border-radius:4px; padding:1px 5px}
+
+  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(210px,1fr)); gap:14px; margin:20px 0}
+  .card{border:1px solid var(--rule); border-radius:7px; padding:15px 16px; background:#fff}
+  .card .n{font-family:var(--serif); font-size:13px; color:var(--muted);
+           text-transform:uppercase; letter-spacing:.09em; margin-bottom:5px}
+  .card .t{font-weight:600; color:var(--ink); margin-bottom:5px}
+  .card p{font-size:15px; margin:0; color:#4a4a4a}
+
+  .tablewrap{overflow-x:auto; margin:18px 0}
+  table{border-collapse:collapse; width:100%; font-size:15px; min-width:430px}
+  th,td{padding:8px 11px; text-align:left; border-bottom:1px solid var(--rule)}
+  th{font-family:var(--serif); font-weight:600; color:var(--ink);
+     border-bottom:1.5px solid #c9c9c9; white-space:nowrap}
+  td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
+  tr.best td{background:#f5faf6}
+  tr.best td.num{font-weight:600; color:var(--green)}
+  caption{caption-side:bottom; text-align:left; font-size:14px;
+          color:var(--muted); padding-top:9px}
+
+  .pull{border-left:3px solid var(--cardinal); padding:3px 0 3px 16px;
+        margin:22px 0; color:var(--ink); font-family:var(--serif);
+        font-size:18.5px; line-height:1.55}
+
+  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+         gap:12px; margin:20px 0}
+  .stat{border:1px solid var(--rule); border-radius:7px; padding:14px; text-align:center}
+  .stat .v{font-family:var(--serif); font-size:26px; color:var(--ink); line-height:1.1}
+  .stat .v small{font-size:15px; color:var(--muted)}
+  .stat .l{font-size:13.5px; color:var(--muted); margin-top:5px; line-height:1.4}
+
+  details{border-top:1px solid var(--rule); padding:13px 0}
+  details:last-of-type{border-bottom:1px solid var(--rule)}
+  summary{cursor:pointer; font-weight:600; color:var(--ink); list-style:none;
+          display:flex; gap:10px; align-items:flex-start}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"+"; color:var(--muted); font-weight:400; flex:none}
+  details[open] summary::before{content:"–"}
+  details p{margin:10px 0 2px; padding-left:20px; font-size:16px}
+
+  footer{border-top:1px solid var(--rule); margin-top:46px; padding:22px 0 44px;
+         font-size:14px; color:var(--muted); text-align:center}
+
+  .c-blue{color:var(--blue); font-weight:600}
+  .c-green{color:var(--green); font-weight:600}
+  .c-red{color:var(--cardinal); font-weight:600}
+
+  @media (max-width:600px){
+    body{font-size:16px}
+    header{padding:36px 0 4px}
+    nav .inner{gap:14px}
+  }
+</style>
+</head>
+<body>
+
+<nav><div class="inner">
+  <span class="brand">VisTacAlign</span>
+  <a href="#overview">Overview</a>
+  <a href="#method">Method</a>
+  <a href="#touch">Touch</a>
+  <a href="#vision">Vision</a>
+  <a href="#results">Results</a>
+  <a href="#qa">Q&amp;A</a>
+</div></nav>
+
+<div class="wrap">
+
+<header>
+  <h1>VisTacAlign</h1>
+  <p class="sub">Co-Training Dexterous Policies on Tactile Human and Robot Demonstrations</p>
+  <p class="authors">Anonymous Authors</p>
+  <p class="venue">Under review, ICRA 2027</p>
+  <div class="links">
+    <span>Paper &middot; coming soon</span>
+    <span>Code &middot; coming soon</span>
+  </div>
+</header>
+
+<figure>
+  <img src="static/images/splash.png" alt="Human demonstrations with a tactile glove and robot demonstrations on a tactile robot hand are brought into a shared representation, then deployed on the robot.">
+  <figcaption><b>Tactile co-training for dexterous manipulation.</b> Human demonstrations collected with a
+  capacitive tactile glove (<span class="c-blue">blue</span>) and robot demonstrations collected on a tactile
+  robot hand (<span class="c-green">green</span>) are brought into a shared representation through visuotactile
+  alignment and kinematic retargeting. The aligned demonstrations form a single co-training dataset spanning
+  drill, strawberry and Lego tasks. The resulting policy is deployed in the real world, shown here reaching,
+  grasping and lifting a power drill.</figcaption>
+</figure>
+
+<section id="overview">
+  <h2>Overview</h2><div class="rule"></div>
+  <p class="lead">Human demonstrations are a cheap source of data for dexterous manipulation. But co-training a
+  robot policy on them requires closing the human&ndash;robot gap in <em>every</em> modality the policy consumes,
+  not just vision.</p>
+
+  <p>VisTacAlign closes that gap in three places at once. Glove-tracked hand motion is retargeted to a 17-DoF
+  tactile robot hand with a one-time fingertip correction. The human hand is erased from both stereo views and
+  replaced by a posed robot-hand mesh painted with pixels from robot recordings, and a real-time stereo
+  foundation model is re-run on the composite, so human point clouds carry the same stereo errors and visibility
+  as robot clouds. A capacitive tactile glove is aligned to the robot's fingertip sensors in its own signal
+  space, giving one interpretable per-finger force representation.</p>
+
+  <p>A diffusion transformer consumes point-cloud, proprioceptive and per-finger tactile tokens. On three
+  real-world tasks that require precise force, adding aligned human demonstrations to existing robot data
+  improves over robot-only policies.</p>
+
+  <div class="pull">Human demonstrations <em>without</em> aligned touch are worse than no human data at all.</div>
+
+  <div class="stats">
+    <div class="stat"><div class="v">10 <small>&rarr;</small> 80<small>%</small></div>
+      <div class="l">Lego task success, robot-only vs co-trained</div></div>
+    <div class="stat"><div class="v">50 <small>&rarr;</small> 70<small>%</small></div>
+      <div class="l">Drill lift success with aligned human data</div></div>
+    <div class="stat"><div class="v">0 <small>&rarr;</small> 70<small>%</small></div>
+      <div class="l">Plucking large strawberries</div></div>
+    <div class="stat"><div class="v">92 <small>&rarr;</small> 58<small>%</small></div>
+      <div class="l">Domain classifier on tactile signals, chance is 50%</div></div>
+  </div>
+</section>
+
+<section id="method">
+  <h2>How does VisTacAlign work?</h2><div class="rule"></div>
+  <p>The framework has four components. The first three erase a different part of the embodiment gap. The fourth
+  consumes the result.</p>
+
+  <div class="cards">
+    <div class="card"><div class="n">Component 1</div><div class="t">Kinematic retargeting</div>
+      <p>Glove hand poses mapped to the robot hand, with a learned fingertip correction calibrated once against
+      a headset as pseudo ground truth.</p></div>
+    <div class="card"><div class="n">Component 2</div><div class="t">Tactile alignment</div>
+      <p>A static map carries human glove forces into the robot's own taxel units, fitted from unpaired
+      demonstrations.</p></div>
+    <div class="card"><div class="n">Component 3</div><div class="t">Visual alignment (Rp2d)</div>
+      <p>The human hand is removed and a robot-textured mesh is composited back into both stereo views, then
+      stereo is re-run.</p></div>
+    <div class="card"><div class="n">Component 4</div><div class="t">3D-tactile transformer</div>
+      <p>A 23.5M-parameter policy over point-cloud, proprioceptive and tactile tokens, trained with consistency
+      flow matching.</p></div>
+  </div>
+
+  <figure>
+    <img src="static/images/pipeline.png" alt="Pipeline: human and robot streams are aligned in vision, touch and kinematics, fed to a diffusion transformer, and deployed.">
+    <figcaption><b>The co-training pipeline.</b> <em>Top:</em> human demonstrations with a tactile glove
+    (<span class="c-blue">blue</span>) and teleoperated robot demonstrations (<span class="c-green">green</span>)
+    become a shared co-training dataset. Each stream provides object-centric point clouds, per-finger tactile
+    activations and action trajectories. <em>Middle:</em> a diffusion transformer encodes point-cloud,
+    proprioception and tactile tokens as context and denoises 64-step action chunks. <em>Bottom:</em> the
+    co-trained policies are deployed on the robot across all three tasks.</figcaption>
+  </figure>
+
+  <h3>Fixing the fingertips first</h3>
+  <p>Motion-capture gloves report fingertip positions with centimetre errors in pinch grasps, caused by hand-size
+  variation and the glove's assumed skeleton. On a real robot that is the difference between a grasp and a miss.
+  We calibrate once against a headset's hand tracker, fitting a small network that nudges each joint by at most
+  20&deg; while keeping bone lengths fixed.</p>
+
+  <div class="tablewrap">
+  <table>
+    <caption>Held-out evaluation over five temporal folds and two held-out recordings.</caption>
+    <thead><tr><th>Metric</th><th class="num">Raw glove</th><th class="num">Corrected</th></tr></thead>
+    <tbody>
+      <tr class="best"><td>Median fingertip error</td><td class="num">13.7 mm</td><td class="num">7.1 mm</td></tr>
+      <tr class="best"><td>Thumb&ndash;index error at pinches</td><td class="num">11.8 mm</td><td class="num">3.4 mm</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <figure>
+    <img src="static/images/pinch_correction.png" alt="Raw glove tracking leaves a gap between thumb and index during a pinch; the correction closes it.">
+    <figcaption><b>Pinch correction.</b> Raw glove tracking (<span class="c-red">red</span>) leaves a gap between
+    the thumb and index fingertips during a pinch. Our correction (<span class="c-green">green</span>) snaps the
+    retargeted thumb into contact so the robot hand closes the grasp.</figcaption>
+  </figure>
+</section>
+
+<section id="touch">
+  <h2>How do we align touch?</h2><div class="rule"></div>
+  <p>The two sensors have nothing in common. The human wears a capacitive glove with 202 normal-force taxels at
+  60&nbsp;Hz. The robot has Hall-effect fingertip arrays with 363 three-axis taxels. They differ in layout, gain,
+  saturation and contact geometry. A policy trained on the naively pooled data would see two unrelated force
+  scales and could not exploit touch at all.</p>
+
+  <p>Both sides are first reduced to one scalar per fingertip. We then fit a static map that carries the human
+  distribution onto the robot's, matching both the total load and how that load is shared between fingers. It is
+  fitted once per task from unpaired frames, has a single hyperparameter, and is applied to the human dataset
+  when it is built. Robot data and the deployed policy are never transformed.</p>
+
+  <p>Because every output is an average of robot samples, the mapped signal is still a force in the robot's own
+  taxel units. It maps the absence of contact to zero and can never leave the robot's force range.</p>
+
+  <figure>
+    <img src="static/images/tactile_alignment.png" alt="Glove and robot taxel activations during the same drill grasp, and the mapped force distributions.">
+    <figcaption><b>Tactile alignment.</b> During the same drill grasp the glove
+    (<span class="c-blue">blue</span>) and the robot hand (<span class="c-green">green</span>) produce taxel
+    activations with different layouts, sensitivities and ranges (left). Each is reduced to a per-finger force
+    and the human distribution is mapped onto the robot's (right). Raw human forces are broadly spread relative
+    to the robot. Mapped forces overlap the robot in the joint thumb&ndash;index density and in the per-finger
+    marginals.</figcaption>
+  </figure>
+
+  <h3>Does the alignment actually work?</h3>
+  <p>We check it directly against the robot distribution with standard two-sample statistics, on held-out
+  episodes with the map refitted per fold. This is possible precisely <em>because</em> the alignment lives in
+  signal space rather than a learned latent space.</p>
+
+  <div class="tablewrap">
+  <table>
+    <caption>Held-out episodes, five folds, map refitted per fold. Chance accuracy for the classifier is 50%.</caption>
+    <thead><tr><th>Measure</th><th class="num">Before</th><th class="num">After</th></tr></thead>
+    <tbody>
+      <tr class="best"><td>KS distance to robot marginal (thumb)</td><td class="num">0.33</td><td class="num">0.08</td></tr>
+      <tr class="best"><td>KS distance to robot marginal (index)</td><td class="num">0.42</td><td class="num">0.08</td></tr>
+      <tr class="best"><td>Human-vs-robot force classifier</td><td class="num">92%</td><td class="num">58%</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="vision">
+  <h2>How do we align vision?</h2><div class="rule"></div>
+  <p>Depth alone does not close the gap between the two sources. The robot hand is anthropomorphic, but it still
+  differs from a gloved human hand in size, shape and colour. So we align the human demonstrations to the robot's
+  appearance in 3D before training, and the policy sees the same hand at training time and at deployment.</p>
+
+  <p>Both streams are observed by the same stereo camera and lifted with a real-time stereo foundation model.
+  For human demonstrations, every pixel outside the task masks is blanked, including the hand and arm. The robot
+  hand mesh is posed at the tracked wrist, painted with real pixels sampled from robot recordings, composited
+  back into <em>both</em> stereo views, and stereo is run a second time on the composite.</p>
+
+  <div class="pull">The second pass is the point. It gives the inserted hand the same stereo-matching
+  characteristics as the robot clouds, instead of pasting clean geometry into a measured scene.</div>
+
+  <figure>
+    <img src="static/images/visual_alignment.png" alt="Both streams lifted to 3D; the human hand is replaced with a posed, coloured robot-hand mesh and re-stereoed.">
+    <figcaption><b>Visual alignment.</b> Both streams are lifted to 3D and share the same crops. For human
+    demonstrations (<span class="c-blue">blue</span>), the segmented hand is replaced by a posed robot-hand mesh,
+    coloured and reprojected into the image (<span class="c-red">red</span>), so the resulting cloud matches what
+    the robot (<span class="c-green">green</span>) observes at deployment.</figcaption>
+  </figure>
+
+  <h3>Is the composited hand actually measured?</h3>
+  <p>Yes, and it is measurable. Mesh points inserted straight into a real cloud stay separable from sensed points
+  by their surface roughness, because they carry no sensor noise. After the second stereo pass, that signature is
+  nearly gone.</p>
+
+  <div class="tablewrap">
+  <table>
+    <caption>Separability is the area under the ROC curve of a roughness-based test. 0.5 means indistinguishable
+    from real sensed points.</caption>
+    <thead><tr><th>Measure</th><th class="num">Pasted mesh</th><th class="num">Composited (ours)</th></tr></thead>
+    <tbody>
+      <tr class="best"><td>Separability from sensed points</td><td class="num">0.99</td><td class="num">0.67&ndash;0.76</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="tablewrap">
+  <table>
+    <caption>Distance from the human hand cloud to a robot hand cloud at the nearest joint configuration.</caption>
+    <thead><tr><th>Measure</th><th class="num">Glove cloud</th><th class="num">Composited</th></tr></thead>
+    <tbody>
+      <tr class="best"><td>Chamfer distance</td><td class="num">13.3 mm</td><td class="num">10.2 mm</td></tr>
+      <tr class="best"><td>F-score at 10 mm</td><td class="num">0.40</td><td class="num">0.59</td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="results">
+  <h2>How well does it work?</h2><div class="rule"></div>
+  <p>Three real-world tasks, each chosen because success depends on force rather than motion alone. A
+  configuration such as <span class="kbd">26H10R</span> means 26 human and 10 robot demonstrations. Human
+  demonstrations are roughly two to three times faster to collect and need no robot at all, only the glove, the
+  wrist tracker and a stereo camera.</p>
+
+  <h3>Drill: human data helps, but only with touch</h3>
+  <p>The robot must approach a power drill, activate its trigger, and lift it while keeping the trigger held.
+  Every robot demonstration carries tactile data, so even the robot-only policy sees force.</p>
+
+  <div class="tablewrap">
+  <table>
+    <caption>Subtask success rate (%), 20 rollouts per policy. Lift is overall task success. Obs. is the visual
+    observation, point cloud (PC) or RGB. <em>Human tact.</em> indicates whether the human demonstrations also
+    carry aligned tactile.</caption>
+    <thead><tr><th>Demos</th><th>Obs.</th><th>Human tact.</th>
+      <th class="num">Approach</th><th class="num">Activate</th><th class="num">Lift</th></tr></thead>
+    <tbody>
+      <tr><td>26R</td><td>RGB</td><td>&ndash;</td><td class="num">100</td><td class="num">35</td><td class="num">35</td></tr>
+      <tr><td>26R</td><td>PC</td><td>&ndash;</td><td class="num">90</td><td class="num">65</td><td class="num">50</td></tr>
+      <tr class="best"><td>26H26R</td><td>PC</td><td>yes</td><td class="num">80</td><td class="num">70</td><td class="num">70</td></tr>
+      <tr><td>10R</td><td>PC</td><td>&ndash;</td><td class="num">85</td><td class="num">65</td><td class="num">35</td></tr>
+      <tr><td>26H10R</td><td>PC</td><td>no</td><td class="num">95</td><td class="num">65</td><td class="num">30</td></tr>
+      <tr class="best"><td>26H10R</td><td>PC</td><td>yes</td><td class="num">100</td><td class="num">55</td><td class="num">55</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>The comparison that matters is the last three rows. Starting from 10 robot demonstrations, adding 26
+  <em>touchless</em> human demonstrations drops success from 35% to 30%. Adding the same demonstrations with
+  aligned tactile raises it to 55%. Since <span class="kbd">26H10R</span> and <span class="kbd">26R</span> cost
+  about the same to collect, the aligned human data is the better use of that time.</p>
+
+  <h3>Strawberry: touch regulates force</h3>
+  <p>The robot must pluck a strawberry held by a magnet, which takes enough force to overcome the magnet without
+  crushing the fruit. Here we co-train on 124 human and 84 robot demonstrations.</p>
+
+  <figure>
+    <img src="static/images/strawberry_force.png" alt="Mean peak grasp force by fruit size: the robot-only policy under-grips small fruit and over-grips large; the co-trained policy stays near the demonstration force.">
+    <figcaption><b>Mean peak grasp force</b> (thumb + index) in taxel units, for three fruit sizes, ten trials
+    per size for each policy. The dashed line is the force at which the demonstrations hold the fruit. The
+    robot-only policy under-grips small fruit and over-grips medium and large, while the co-trained tactile
+    policy stays in a narrow band across all sizes.</figcaption>
+  </figure>
+
+  <div class="tablewrap">
+  <table>
+    <caption>Plucking success (%) per fruit size, ten rollouts per cell.</caption>
+    <thead><tr><th>Fruit size</th><th class="num">Robot only</th><th class="num">Co-train + tactile</th></tr></thead>
+    <tbody>
+      <tr class="best"><td>Small (20&ndash;25 mm)</td><td class="num">60</td><td class="num">90</td></tr>
+      <tr class="best"><td>Medium (30&ndash;35 mm)</td><td class="num">70</td><td class="num">80</td></tr>
+      <tr class="best"><td>Large (40&ndash;45 mm)</td><td class="num">0</td><td class="num">70</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>Lego: the recipe scales</h3>
+  <p>The robot must pick up a brick, align it over a base plate, push until it snaps in, and retreat. This task
+  also isolates the visual alignment: <em>No Rp2d</em> feeds the raw human point cloud instead of the composited
+  one.</p>
+
+  <div class="tablewrap">
+  <table>
+    <caption>Subtask success rate (%) across 20 trials. Top block: a robot-only baseline and the full method with
+    a growing number of robot demonstrations. Bottom block: ablations removing the visual alignment or the
+    tactile input.</caption>
+    <thead><tr><th>Demos</th><th>Tactile</th><th>Rp2d</th>
+      <th class="num">Pickup</th><th class="num">Align</th><th class="num">Push</th><th class="num">Retreat</th></tr></thead>
+    <tbody>
+      <tr><td>30R</td><td>yes</td><td>&ndash;</td><td class="num">70</td><td class="num">10</td><td class="num">10</td><td class="num">10</td></tr>
+      <tr><td>50H10R</td><td>yes</td><td>yes</td><td class="num">90</td><td class="num">50</td><td class="num">40</td><td class="num">40</td></tr>
+      <tr><td>50H20R</td><td>yes</td><td>yes</td><td class="num">60</td><td class="num">60</td><td class="num">60</td><td class="num">60</td></tr>
+      <tr class="best"><td>50H30R</td><td>yes</td><td>yes</td><td class="num">100</td><td class="num">80</td><td class="num">80</td><td class="num">80</td></tr>
+      <tr><td>50H10R</td><td>yes</td><td>no</td><td class="num">100</td><td class="num">50</td><td class="num">10</td><td class="num">10</td></tr>
+      <tr><td>50H20R</td><td>yes</td><td>no</td><td class="num">100</td><td class="num">100</td><td class="num">30</td><td class="num">25</td></tr>
+      <tr><td>50H30R</td><td>no</td><td>yes</td><td class="num">70</td><td class="num">70</td><td class="num">70</td><td class="num">70</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>Final success grows with the number of robot demonstrations, from 40% with 10 to 60% with 20 and 80% with
+  30, against 10% for 30 robot demonstrations alone. Human demonstrations do not replace robot data. They improve
+  what a few robot demonstrations are worth. Without the visual alignment the policy still picks up the brick,
+  but success collapses at the push and retreat stages, where contact matters most.</p>
+</section>
+
+<section id="hardware">
+  <h2>Hardware</h2><div class="rule"></div>
+  <figure>
+    <img src="static/images/hardware_overview.png" alt="Benchtop setup: tactile glove and wrist tracker for humans, tactile robot hand on a 7-DoF arm, stereo camera observing the workspace.">
+    <figcaption><b>Setup.</b> Human demonstrations are collected with a motion-capture glove fitted with our
+    capacitive tactile glove. Robot demonstrations use a 17-DoF tactile hand on a 7-DoF arm. Trackers on the
+    glove, the camera mount and the table provide a shared frame, and a stereo camera observes the
+    workspace.</figcaption>
+  </figure>
+</section>
+
+<section id="qa">
+  <h2>Q&amp;A</h2><div class="rule"></div>
+
+  <details><summary>Why align in signal space instead of a learned latent space?</summary>
+  <p>Three reasons. The aligned quantity is still a per-finger force in the robot's units, so it can be checked
+  directly against the robot distribution with standard statistics, which is exactly what the tables above do.
+  The map is fitted once and deterministically from a few thousand unpaired frames, with one hyperparameter and
+  no encoder to train. And because it is static and acts frame by frame, it cannot shift the timing of contact
+  events.</p>
+  <p>We do not compare head-to-head against a learned latent alignment. Our case rests on interpretability and on
+  guarantees that hold by construction, and quantifying that trade-off is the most immediate item of future
+  work.</p></details>
+
+  <details><summary>Why re-run stereo instead of just pasting the robot hand into the cloud?</summary>
+  <p>Because a pasted mesh is not a measurement. Its points are noise-free, uniformly dense, and cover surfaces a
+  single-view sensor could never see. A simple roughness test separates them from real sensed points almost
+  perfectly, at 0.99 area under the curve, which means a policy can learn that shortcut too. Running stereo on
+  the composite drops that to 0.67&ndash;0.76.</p></details>
+
+  <details><summary>Do you still need robot demonstrations?</summary>
+  <p>Yes. The tactile map is fitted per task from unpaired force samples, so a short robot recording of the
+  task's contacts is still needed. The result is not that human data replaces robot data, but that it
+  substantially raises what a small number of robot demonstrations is worth.</p></details>
+
+  <details><summary>What are the main limitations?</summary>
+  <p>The tactile map is fitted per task. Reducing a fingertip to one normal force discards the taxel layout and
+  shear, which likely matters for in-hand manipulation and slip. The tasks are short-horizon and largely
+  quasi-static. And we do not compare against alignment in a learned latent space.</p></details>
+
+  <details><summary>How fast does the policy run?</summary>
+  <p>The policy has 23.5M parameters. At deployment, stereo runs at 20&nbsp;Hz, the glove at 60&nbsp;Hz and the
+  robot taxels at 30&nbsp;Hz. We sample 10 flow steps and execute the first 32 of a 64-step chunk, about 1.1
+  seconds, before replanning, which takes 269&nbsp;ms on a consumer GPU.</p></details>
+
+  <details><summary>Does the aligned human data change how hard the robot grips?</summary>
+  <p>That is the clearest single effect. On the strawberry task the robot-only policy under-grips small fruit and
+  over-grips large fruit, and never plucks the largest size. The co-trained policy holds a narrow force band
+  across all three sizes and succeeds on every one. Grasp force is precisely the quantity the tactile alignment
+  transfers from the human hand.</p></details>
+</section>
+
+<footer>
+  Anonymous submission under review at ICRA 2027. This page contains no author or institutional information.
+</footer>
+
+</div>
+</body>
+</html>
