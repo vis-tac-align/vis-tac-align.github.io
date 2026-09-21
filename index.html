@@ -76,10 +76,15 @@
         backdrop-filter:saturate(180%) blur(20px);
         -webkit-backdrop-filter:saturate(180%) blur(20px)}
   }
-  nav .inner{max-width:1280px; margin:0 auto; padding:0 clamp(20px,5vw,40px);
-             height:48px; display:flex; gap:26px; align-items:center; overflow-x:auto}
+  nav .inner{max-width:1280px; margin:0 auto; padding:0 clamp(16px,5vw,40px);
+             height:48px; display:flex; gap:16px; align-items:center}
+  nav .links{display:flex; gap:22px; align-items:center; margin-right:auto;
+             overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
+             mask-image:linear-gradient(90deg,#000 88%,transparent);
+             -webkit-mask-image:linear-gradient(90deg,#000 88%,transparent)}
+  nav .links::-webkit-scrollbar{display:none}
   nav .brand{font-weight:700; color:var(--text); letter-spacing:-.2px;
-             margin-right:auto; white-space:nowrap}
+             white-space:nowrap; flex:none}
   nav a{color:var(--text2); text-decoration:none; font-size:14px; white-space:nowrap;
         transition:color var(--fast)}
   nav a:hover{color:var(--text)}
@@ -182,7 +187,8 @@
   tr.best td{background:color-mix(in srgb, var(--green) 9%, transparent)}
   tr.best td.num{font-weight:700; color:var(--green)}
   caption{caption-side:bottom; text-align:left; font-size:14px;
-          color:var(--text2); padding-top:12px; line-height:1.5}
+          color:var(--text2); padding-top:12px; line-height:1.5;
+          position:sticky; left:0; width:min(100%,calc(100vw - 76px))}
 
   .pull{border-left:3px solid transparent;
         border-image:var(--grad) 1;
@@ -217,19 +223,33 @@
   .c-green{color:var(--green); font-weight:700}
   .c-red{color:var(--red2); font-weight:700}
 
-  @media (max-width:600px){ body{font-size:16px} nav .inner{gap:18px} }
+  @media (max-width:620px){
+    body{font-size:16px}
+    nav .links{gap:18px}
+    .tablewrap{padding:4px 12px 12px; border-radius:12px;
+               mask-image:linear-gradient(90deg,#000 91%,transparent);
+               -webkit-mask-image:linear-gradient(90deg,#000 91%,transparent)}
+    table{min-width:368px; font-size:14px}
+    th,td{padding:9px 8px}
+    caption{mask-image:none; -webkit-mask-image:none}
+    figure.narrow img{padding:8px}
+    .pull{font-size:18px; padding-left:16px}
+    .stat .v{font-size:27px}
+  }
 </style>
 </head>
 <body>
 
 <nav><div class="inner">
   <span class="brand">VisTacAlign</span>
-  <a href="#overview">Overview</a>
-  <a href="#method">Method</a>
-  <a href="#touch">Touch</a>
-  <a href="#vision">Vision</a>
-  <a href="#results">Results</a>
-  <a href="#qa">Q&amp;A</a>
+  <div class="links">
+    <a href="#overview">Overview</a>
+    <a href="#method">Method</a>
+    <a href="#touch">Touch</a>
+    <a href="#vision">Vision</a>
+    <a href="#results">Results</a>
+    <a href="#qa">Q&amp;A</a>
+  </div>
   <button id="theme" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
     <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
     <svg class="moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg>
