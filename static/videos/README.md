@@ -1,4 +1,4 @@
-Drop rollout clips here, then uncomment the Rollouts section in index.html.
+Web clips for index.html (source: the VisTacAlign talk deck GIFs). Posters are frame 0.5 s.
 
 Encode for web (small, seekable, autoplays on iOS):
 
