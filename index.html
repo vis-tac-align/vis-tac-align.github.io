@@ -196,7 +196,9 @@
   .stat .l{font-size:14px; color:var(--text2); margin-top:8px; line-height:1.45}
 
   details{border-top:1px solid var(--border); padding:16px 0}
-  details:last-of-type{border-bottom:1px solid var(--border)}
+  details.more{border:0; padding:6px 0; margin:6px 0 10px}
+  details.more summary{color:var(--accent); font-weight:600; font-size:15px}
+  #qa details:last-of-type{border-bottom:1px solid var(--border)}
   summary{cursor:pointer; font-weight:700; color:var(--text); list-style:none;
           display:flex; gap:12px; align-items:flex-start; transition:color var(--fast)}
   summary:hover{color:var(--accent)}
@@ -247,7 +249,7 @@
 
 <div class="wrap">
 
-<header>
+<header id="top">
   <h1 class="grad">VisTacAlign</h1>
   <p class="sub">Co-Training Dexterous Policies on Tactile Human and Robot Demonstrations</p>
   <p class="authors">Anonymous Authors</p>
@@ -335,15 +337,6 @@
     </div>
   </div>
 
-  <figure class="tall">
-    <img src="static/images/splash.jpg" alt="Human demonstrations with a tactile glove and robot demonstrations on a tactile robot hand are brought into a shared representation, then deployed on the robot.">
-    <figcaption><b>One dataset from two embodiments.</b> Glove demonstrations (<span class="c-blue">blue</span>) and
-    robot demonstrations (<span class="c-green">green</span>) are aligned into a single co-training set, and the
-    resulting policy runs on the robot.</figcaption>
-  </figure>
-
-  <p class="prose">Four components: three erase a different part of the embodiment gap, and the fourth consumes the result.</p>
-
   <div class="cards">
     <div class="card"><div class="n">Component 1</div><div class="t">Kinematic retargeting</div>
       <p class="prose">Glove hand poses mapped to the robot hand, with a learned fingertip correction calibrated once against
@@ -359,6 +352,7 @@
       flow matching.</p></div>
   </div>
 
+  <details class="more"><summary>The full pipeline and policy architecture</summary>
   <figure>
     <img src="static/images/pipeline.jpg" alt="Pipeline: human and robot streams are aligned in vision, touch and kinematics, fed to a diffusion transformer, and deployed.">
     <figcaption><b>The co-training pipeline.</b> <em>Top:</em> human demonstrations with a tactile glove
@@ -368,13 +362,11 @@
     proprioception and tactile tokens as context and denoises 64-step action chunks. <em>Bottom:</em> the
     co-trained policies are deployed on the robot across all three tasks.</figcaption>
   </figure>
+  </details>
 
-  <h3>Fixing the fingertips first</h3>
-  <p class="prose">Motion-capture gloves report fingertip positions with centimetre errors in pinch grasps, caused by hand-size
-  variation and the glove's assumed skeleton. On a real robot that is the difference between a grasp and a miss.
-  We calibrate once against a headset's hand tracker, fitting a small network that nudges each joint by at most
-  20&deg; while keeping bone lengths fixed.</p>
-
+  <details class="more"><summary>Fixing the glove's fingertips (13.7 mm &rarr; 7.1 mm error)</summary>
+  <p class="prose">Motion-capture gloves miss pinch grasps by about a centimetre. We calibrate once against a headset's
+  hand tracker, fitting a small network that nudges each joint by at most 20&deg; with bone lengths fixed.</p>
   <div class="tablewrap">
   <table>
     <caption>Held-out evaluation over five temporal folds and two held-out recordings.</caption>
@@ -385,29 +377,20 @@
     </tbody>
   </table>
   </div>
-
   <figure>
     <img src="static/images/pinch_correction.jpg" alt="Raw glove tracking leaves a gap between thumb and index during a pinch; the correction closes it.">
     <figcaption><b>Pinch correction.</b> Raw glove tracking (<span class="c-red">red</span>) leaves a gap between
     the thumb and index fingertips during a pinch. Our correction (<span class="c-green">green</span>) snaps the
     retargeted thumb into contact so the robot hand closes the grasp.</figcaption>
   </figure>
+  </details>
 </section>
 
 <section id="touch">
   <h2>How do we align touch?</h2><div class="rule"></div>
-  <p class="prose">The two sensors have nothing in common. The human wears a capacitive glove with 202 normal-force taxels at
-  60&nbsp;Hz. The robot has Hall-effect fingertip arrays with 363 three-axis taxels. They differ in layout, gain,
-  saturation and contact geometry. A policy trained on the naively pooled data would see two unrelated force
-  scales and could not exploit touch at all.</p>
-
-  <p class="prose">Both sides are first reduced to one scalar per fingertip. We then fit a static map that carries the human
-  distribution onto the robot's, matching both the total load and how that load is shared between fingers. It is
-  fitted once per task from unpaired frames, has a single hyperparameter, and is applied to the human dataset
-  when it is built. Robot data and the deployed policy are never transformed.</p>
-
-  <p class="prose">Because every output is an average of robot samples, the mapped signal is still a force in the robot's own
-  taxel units. It maps the absence of contact to zero and can never leave the robot's force range.</p>
+  <p class="prose">The glove and the robot fingertips share nothing: different layout, gain and range. We reduce each to one
+  force per finger and fit a single static map that carries the human distribution onto the robot's, in the robot's
+  own units. Zero contact stays zero, and the policy and robot data are never transformed.</p>
 
   <figure>
     <img src="static/images/tactile_alignment.jpg" alt="Glove and robot taxel activations during the same drill grasp, and the mapped force distributions.">
@@ -418,20 +401,6 @@
     to the robot. Mapped forces overlap the robot in the joint thumb&ndash;index density and in the per-finger
     marginals.</figcaption>
   </figure>
-
-  <figure>
-    <video data-src="static/videos/touch_gap.mp4" poster="static/videos/touch_gap.jpg" muted loop playsinline preload="none" aria-label="Human and robot tactile signals during the same drill grasp"></video>
-    <figcaption><b>The tactile gap.</b> The glove (top) and the robot hand (bottom) during the same grasp.
-    Taxel layouts differ, load is shared differently between fingers, and peak forces differ by up to 3&times;.</figcaption>
-  </figure>
-
-
-
-  <h3>Does the alignment actually work?</h3>
-  <p class="prose">We check it directly against the robot distribution with standard two-sample statistics, on held-out
-  episodes with the map refitted per fold. This is possible precisely <em>because</em> the alignment lives in
-  signal space rather than a learned latent space.</p>
-
   <div class="tablewrap">
   <table>
     <caption>Held-out episodes, five folds, map refitted per fold. Chance accuracy for the classifier is 50%.</caption>
@@ -443,21 +412,21 @@
     </tbody>
   </table>
   </div>
+
+  <details class="more"><summary>Watch the raw human and robot signals side by side</summary>
+  <figure>
+    <video data-src="static/videos/touch_gap.mp4" poster="static/videos/touch_gap.jpg" muted loop playsinline preload="none" aria-label="Human and robot tactile signals during the same drill grasp"></video>
+    <figcaption><b>The tactile gap.</b> The glove (top) and the robot hand (bottom) during the same grasp.
+    Taxel layouts differ, load is shared differently between fingers, and peak forces differ by up to 3&times;.</figcaption>
+  </figure>
+  </details>
 </section>
 
 <section id="vision">
   <h2>How do we align vision?</h2><div class="rule"></div>
-  <p class="prose">Depth alone does not close the gap between the two sources. The robot hand is anthropomorphic, but it still
-  differs from a gloved human hand in size, shape and colour. So we align the human demonstrations to the robot's
-  appearance in 3D before training, and the policy sees the same hand at training time and at deployment.</p>
-
-  <p class="prose">Both streams are observed by the same stereo camera and lifted with a real-time stereo foundation model.
-  For human demonstrations, every pixel outside the task masks is blanked, including the hand and arm. The robot
-  hand mesh is posed at the tracked wrist, painted with real pixels sampled from robot recordings, composited
-  back into <em>both</em> stereo views, and stereo is run a second time on the composite.</p>
-
-  <div class="pull"><span class="c-blue">The second pass is the point.</span> It gives the inserted hand the same stereo-matching
-  characteristics as the robot clouds, instead of pasting clean geometry into a measured scene.</div>
+  <p class="prose">The human hand is erased from both stereo views and the robot's hand mesh, painted with real robot pixels,
+  is composited in its place. Stereo is then run <em>again</em>, so the inserted hand carries the same sensor noise as
+  real robot clouds instead of looking pasted in.</p>
 
   <figure>
     <img src="static/images/visual_alignment.jpg" alt="Both streams lifted to 3D; the human hand is replaced with a posed, coloured robot-hand mesh and re-stereoed.">
@@ -467,31 +436,15 @@
     the robot (<span class="c-green">green</span>) observes at deployment.</figcaption>
   </figure>
 
-
-
-  <h3>Is the composited hand actually measured?</h3>
-  <p class="prose">Yes, and it is measurable. Mesh points inserted straight into a real cloud stay separable from sensed points
-  by their surface roughness, because they carry no sensor noise. After the second stereo pass, that signature is
-  nearly gone.</p>
-
   <div class="tablewrap">
   <table>
-    <caption>Separability is the area under the ROC curve of a roughness-based test. 0.5 means indistinguishable
-    from real sensed points.</caption>
-    <thead><tr><th>Measure</th><th class="num">Pasted mesh</th><th class="num">Composited (ours)</th></tr></thead>
+    <caption>Separability is the AUC of a roughness test against real sensed points (0.5 = indistinguishable).
+    Chamfer and F-score compare the human hand cloud with a robot hand cloud at the nearest joint configuration.</caption>
+    <thead><tr><th>Measure</th><th class="num">Before</th><th class="num">Ours</th></tr></thead>
     <tbody>
-      <tr class="best"><td>Separability from sensed points</td><td class="num">0.99</td><td class="num">0.67&ndash;0.76</td></tr>
-    </tbody>
-  </table>
-  </div>
-
-  <div class="tablewrap">
-  <table>
-    <caption>Distance from the human hand cloud to a robot hand cloud at the nearest joint configuration.</caption>
-    <thead><tr><th>Measure</th><th class="num">Glove cloud</th><th class="num">Composited</th></tr></thead>
-    <tbody>
-      <tr class="best"><td>Chamfer distance</td><td class="num">13.3 mm</td><td class="num">10.2 mm</td></tr>
-      <tr class="best"><td>F-score at 10 mm</td><td class="num">0.40</td><td class="num">0.59</td></tr>
+      <tr class="best"><td>Separability from sensed points (pasted mesh &rarr; composited)</td><td class="num">0.99</td><td class="num">0.67&ndash;0.76</td></tr>
+      <tr class="best"><td>Chamfer distance (glove cloud &rarr; composited)</td><td class="num">13.3 mm</td><td class="num">10.2 mm</td></tr>
+      <tr class="best"><td>F-score at 10 mm (glove cloud &rarr; composited)</td><td class="num">0.40</td><td class="num">0.59</td></tr>
     </tbody>
   </table>
   </div>
@@ -499,15 +452,13 @@
 
 <section id="results">
   <h2>How well does it work?</h2><div class="rule"></div>
-  <p class="prose">Three real-world tasks, each chosen because success depends on force rather than motion alone. A
-  configuration such as <span class="kbd">26H10R</span> means 26 human and 10 robot demonstrations. Human
-  demonstrations are roughly two to three times faster to collect and need no robot at all, only the glove, the
-  wrist tracker and a stereo camera.</p>
+  <p class="prose">Three real-world tasks where success depends on force. <span class="kbd">26H10R</span> means 26 human
+  and 10 robot demonstrations.</p>
 
   <h3>Drill: human data helps, but only with touch</h3>
-  <p class="prose">The robot must approach a power drill, activate its trigger, and lift it while keeping the trigger held.
-  Every robot demonstration carries tactile data, so even the robot-only policy sees force.</p>
-
+  <p class="prose">Rollouts are at the <a href="#top">top of the page</a>. From 10 robot demonstrations, adding 26
+  <em>touchless</em> human demonstrations lowers success to <span class="c-red">30%</span>. The same demonstrations
+  with aligned touch raise it to <span class="c-green">55%</span>.</p>
   <div class="tablewrap">
   <table>
     <caption>Subtask success rate (%), 20 rollouts per policy. Lift is overall task success. Obs. is the visual
@@ -526,22 +477,25 @@
   </table>
   </div>
 
-  <p class="prose">The comparison that matters is the last three rows. Starting from 10 robot demonstrations, adding 26
-  <em>touchless</em> human demonstrations drops success from <span class="c-red">35% to 30%</span>. Adding the same demonstrations with
-  aligned tactile raises it to <span class="c-green">55%</span>. Since <span class="kbd">26H10R</span> and <span class="kbd">26R</span> cost
-  about the same to collect, the aligned human data is the better use of that time.</p>
-
   <h3>Strawberry: touch regulates force</h3>
-  <p class="prose">The robot must pluck a strawberry held by a magnet, which takes enough force to overcome the magnet without
-  crushing the fruit. Here we co-train on 124 human and 84 robot demonstrations.</p>
-
-  <figure class="narrow">
-    <img src="static/images/strawberry_force.svg" alt="Mean peak grasp force by fruit size: the robot-only policy under-grips small fruit and over-grips large; the co-trained policy stays near the demonstration force.">
-    <figcaption><b>Mean peak grasp force</b> (thumb + index) in taxel units, for three fruit sizes, ten trials
-    per size for each policy. The dashed line is the force at which the demonstrations hold the fruit. The
-    robot-only policy under-grips small fruit and over-grips medium and large, while the co-trained tactile
-    policy stays in a narrow band across all sizes.</figcaption>
-  </figure>
+  <p class="prose">Pluck a strawberry held by a magnet: hard enough to beat the magnet, gentle enough not to crush it.
+  Without touch the policy fails on large fruit entirely.</p>
+  <div class="rollouts">
+    <div class="rollout">
+      <video data-src="static/videos/strawberry_ours.mp4" poster="static/videos/strawberry_ours.jpg" muted loop playsinline preload="none" aria-label="Robot hand plucking a strawberry, co-trained tactile policy"></video>
+      <div class="meta">
+        <div class="t">Co-train + tactile<span class="tag ok">Ours</span></div>
+        <div class="d">Grips hard enough to overcome the magnet without crushing the fruit.</div>
+      </div>
+    </div>
+    <div class="rollout">
+      <video data-src="static/videos/strawberry_robot_only.mp4" poster="static/videos/strawberry_robot_only.jpg" muted loop playsinline preload="none" aria-label="Robot hand plucking a strawberry, robot-only policy"></video>
+      <div class="meta">
+        <div class="t">Robot only, no touch<span class="tag fail">Baseline</span></div>
+        <div class="d">Robot only, no tactile input. It under-grips small fruit and crushes larger ones.</div>
+      </div>
+    </div>
+  </div>
 
   <div class="tablewrap">
   <table>
@@ -555,10 +509,35 @@
   </table>
   </div>
 
-  <h3>Lego: the recipe scales</h3>
-  <p class="prose">The robot must pick up a brick, align it over a base plate, push until it snaps in, and retreat. This task
-  also isolates the visual alignment: <em>No Rp2d</em> feeds the raw human point cloud instead of the composited
-  one.</p>
+  <details class="more"><summary>Grip force by fruit size</summary>
+  <figure class="narrow">
+    <img src="static/images/strawberry_force.svg" alt="Mean peak grasp force by fruit size: the robot-only policy under-grips small fruit and over-grips large; the co-trained policy stays near the demonstration force.">
+    <figcaption><b>Mean peak grasp force</b> (thumb + index) in taxel units, for three fruit sizes, ten trials
+    per size for each policy. The dashed line is the force at which the demonstrations hold the fruit. The
+    robot-only policy under-grips small fruit and over-grips medium and large, while the co-trained tactile
+    policy stays in a narrow band across all sizes.</figcaption>
+  </figure>
+  </details>
+
+  <h3>Lego: the recipe scales, and needs visual alignment</h3>
+  <p class="prose">Pick, align, push until it snaps, retreat. Human data takes success from <span class="c-red">10%</span>
+  to <span class="c-green">80%</span>, and without the visual alignment the push and retreat stages collapse.</p>
+  <div class="rollouts">
+    <div class="rollout">
+      <video data-src="static/videos/lego_ours.mp4" poster="static/videos/lego_ours.jpg" muted loop playsinline preload="none" aria-label="Robot hand stacking a Lego brick, full method"></video>
+      <div class="meta">
+        <div class="t">With visual alignment<span class="tag ok">Ours</span></div>
+        <div class="d">Human point clouds rendered with the robot hand (Rp2d). Co-training takes Lego from 10% to 80% success.</div>
+      </div>
+    </div>
+    <div class="rollout">
+      <video data-src="static/videos/lego_no_rp2d.mp4" poster="static/videos/lego_no_rp2d.jpg" muted loop playsinline preload="none" aria-label="Robot hand stacking a Lego brick, without visual alignment"></video>
+      <div class="meta">
+        <div class="t">No Rp2d<span class="tag fail">Ablation</span></div>
+        <div class="d">Raw human point clouds. The policy still picks up the brick, but success collapses at the push and retreat.</div>
+      </div>
+    </div>
+  </div>
 
   <div class="tablewrap">
   <table>
@@ -578,55 +557,10 @@
     </tbody>
   </table>
   </div>
-
-  <p class="prose">Final success grows with the number of robot demonstrations, from 40% with 10 to 60% with 20 and 80% with
-  30, against <span class="c-red">10%</span> for 30 robot demonstrations alone. Human demonstrations do not replace robot data. They improve
-  what a few robot demonstrations are worth. Without the visual alignment the policy still picks up the brick,
-  but <span class="c-red">success collapses</span> at the push and retreat stages, where contact matters most.</p>
 </section>
 
 
-<section id="rollouts">
-  <h2>Rollouts</h2><div class="rule"></div>
-  <p class="prose">More real-world rollouts (the drill is at the top of the page). In each row our co-trained policy
-  is on the left and the comparison is on the right.</p>
 
-  <h3>Strawberry: touch regulates force</h3>
-  <div class="rollouts">
-    <div class="rollout">
-      <video data-src="static/videos/strawberry_ours.mp4" poster="static/videos/strawberry_ours.jpg" muted loop playsinline preload="none" aria-label="Robot hand plucking a strawberry, co-trained tactile policy"></video>
-      <div class="meta">
-        <div class="t">Co-train + tactile<span class="tag ok">Ours</span></div>
-        <div class="d">Grips hard enough to overcome the magnet without crushing the fruit.</div>
-      </div>
-    </div>
-    <div class="rollout">
-      <video data-src="static/videos/strawberry_robot_only.mp4" poster="static/videos/strawberry_robot_only.jpg" muted loop playsinline preload="none" aria-label="Robot hand plucking a strawberry, robot-only policy"></video>
-      <div class="meta">
-        <div class="t">Robot only, no touch<span class="tag fail">Baseline</span></div>
-        <div class="d">Robot only, no tactile input. It under-grips small fruit and crushes larger ones.</div>
-      </div>
-    </div>
-  </div>
-
-  <h3>Lego: without visual alignment, the contact stages fail</h3>
-  <div class="rollouts">
-    <div class="rollout">
-      <video data-src="static/videos/lego_ours.mp4" poster="static/videos/lego_ours.jpg" muted loop playsinline preload="none" aria-label="Robot hand stacking a Lego brick, full method"></video>
-      <div class="meta">
-        <div class="t">With visual alignment<span class="tag ok">Ours</span></div>
-        <div class="d">Human point clouds rendered with the robot hand (Rp2d). Co-training takes Lego from 10% to 80% success.</div>
-      </div>
-    </div>
-    <div class="rollout">
-      <video data-src="static/videos/lego_no_rp2d.mp4" poster="static/videos/lego_no_rp2d.jpg" muted loop playsinline preload="none" aria-label="Robot hand stacking a Lego brick, without visual alignment"></video>
-      <div class="meta">
-        <div class="t">No Rp2d<span class="tag fail">Ablation</span></div>
-        <div class="d">Raw human point clouds. The policy still picks up the brick, but success collapses at the push and retreat.</div>
-      </div>
-    </div>
-  </div>
-</section>
 
 <section id="hardware">
   <h2>Hardware</h2><div class="rule"></div>
