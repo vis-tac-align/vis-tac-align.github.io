@@ -128,6 +128,8 @@
   .hero-compare .rollouts{margin:0; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
   .hero-cap{text-align:center; color:var(--text2); font-size:15px; line-height:1.55; margin:14px auto 0; max-width:720px}
   .hero-cap b{color:var(--text)}
+  .hero-lead{max-width:760px; margin:26px auto 0; text-align:center}
+  .hero-stats{margin-top:22px}
 
   /* rollout grid */
   .rollouts{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
@@ -230,7 +232,7 @@
 <nav><div class="inner">
   <span class="brand">VisTacAlign</span>
   <div class="links">
-    <a href="#overview">Overview</a>
+    <a href="#overview">Why</a>
     <a href="#method">Method</a>
     <a href="#touch">Touch</a>
     <a href="#vision">Vision</a>
@@ -273,40 +275,12 @@
       </div>
     </div>
   </div>
-  <p class="hero-cap">The robot must grasp a power drill, pull its trigger, and lift it while keeping the trigger held.
-  Adding 26 aligned human demonstrations raises success from <b>50%</b> to <b>70%</b>.</p>
-</div>
-
-<figure class="tall">
-  <img src="static/images/splash.jpg" alt="Human demonstrations with a tactile glove and robot demonstrations on a tactile robot hand are brought into a shared representation, then deployed on the robot.">
-  <figcaption><b>Tactile co-training for dexterous manipulation.</b> Human demonstrations collected with a
-  capacitive tactile glove (<span class="c-blue">blue</span>) and robot demonstrations collected on a tactile
-  robot hand (<span class="c-green">green</span>) are brought into a shared representation through visuotactile
-  alignment and kinematic retargeting. The aligned demonstrations form a single co-training dataset spanning
-  drill, strawberry and Lego tasks. The resulting policy is deployed in the real world, shown here reaching,
-  grasping and lifting a power drill.</figcaption>
-</figure>
-
-<section id="overview">
-  <h2>Overview</h2><div class="rule"></div>
-  <p class="lead prose">Human demonstrations are a cheap source of data for dexterous manipulation. But co-training a
-  robot policy on them requires closing the human&ndash;robot gap in <span class="c-blue">every</span> modality the policy consumes,
-  not just vision.</p>
-
-  <p class="prose">VisTacAlign closes that gap in three places at once. Glove-tracked hand motion is retargeted to a 17-DoF
-  tactile robot hand with a one-time fingertip correction. The human hand is erased from both stereo views and
-  replaced by a posed robot-hand mesh painted with pixels from robot recordings, and a real-time stereo
-  foundation model is re-run on the composite, so human point clouds carry the same stereo errors and visibility
-  as robot clouds. A capacitive tactile glove is aligned to the robot's fingertip sensors in its own signal
-  space, giving one interpretable per-finger force representation.</p>
-
-  <p class="prose">A diffusion transformer consumes point-cloud, proprioceptive and per-finger tactile tokens. On three
-  real-world tasks that require precise force, adding aligned human demonstrations to existing robot data
-  improves over robot-only policies.</p>
-
-  <div class="pull">Human demonstrations <span class="c-red">without aligned touch</span> are <span class="c-red">worse than no human data at all</span>.</div>
-
-  <div class="stats">
+  <p class="hero-cap">Drill task: grasp, pull the trigger, and lift while holding it. Adding 26 aligned human
+  demonstrations raises success from <b>50%</b> to <b>70%</b>.</p>
+  <p class="lead prose hero-lead">Human demonstrations are cheap, but a robot can only learn from them if they <b>look,
+  move and feel</b> like its own. VisTacAlign aligns human demonstrations to the robot in vision, touch and
+  kinematics, so a few robot demonstrations go much further on force-critical dexterous tasks.</p>
+  <div class="stats hero-stats">
     <div class="stat"><div class="v">10 <small>&rarr;</small> 80<small>%</small></div>
       <div class="l">Lego task success, robot-only vs co-trained</div></div>
     <div class="stat"><div class="v">50 <small>&rarr;</small> 70<small>%</small></div>
@@ -316,28 +290,59 @@
     <div class="stat"><div class="v">92 <small>&rarr;</small> 58<small>%</small></div>
       <div class="l">Domain classifier on tactile signals, chance is 50%</div></div>
   </div>
+
+</div>
+
+
+<section id="overview">
+  <h2>Why human demonstrations?</h2><div class="rule"></div>
   <div class="rollouts">
     <div class="rollout">
       <video data-src="static/videos/motiv_human_glove.mp4" poster="static/videos/motiv_human_glove.jpg" muted loop playsinline preload="none" aria-label="Human grasping a drill while wearing a tactile glove"></video>
       <div class="meta">
         <div class="t">Human demonstration<span class="tag speed">glove</span></div>
-        <div class="d">A human wearing a tactile glove. No robot is needed, and each demonstration is two to three times faster to collect.</div>
+        <div class="d">A tactile glove and a tracker. No robot needed, and two to three times faster per demonstration.</div>
       </div>
     </div>
     <div class="rollout">
       <video data-src="static/videos/motiv_robot_teleop.mp4" poster="static/videos/motiv_robot_teleop.jpg" muted loop playsinline preload="none" aria-label="Robot hand teleoperated to grasp a drill"></video>
       <div class="meta">
         <div class="t">Robot teleoperation<span class="tag speed">robot</span></div>
-        <div class="d">The same drill grasp teleoperated on the robot hand. This is the embodiment the policy runs on, but it is slow to collect.</div>
+        <div class="d">The same grasp, teleoperated. The embodiment the policy runs on, but slow to collect.</div>
       </div>
     </div>
   </div>
+  <div class="pull">But human demonstrations <span class="c-red">without aligned touch</span> are
+  <span class="c-red">worse than no human data at all</span>.</div>
 </section>
 
 <section id="method">
   <h2>How does VisTacAlign work?</h2><div class="rule"></div>
-  <p class="prose">The framework has four components. The first three erase a different part of the embodiment gap. The fourth
-  consumes the result.</p>
+  <div class="rollouts">
+    <div class="rollout">
+      <video data-src="static/videos/vision_pipeline.mp4" poster="static/videos/vision_pipeline.jpg" muted loop playsinline preload="none" aria-label="Visual alignment pipeline: raw capture, scene blanked with the robot hand posed, and the resulting human versus robot demonstration"></video>
+      <div class="meta">
+        <div class="t">Vision<span class="tag speed">Rp2d</span></div>
+        <div class="d">The human hand is erased and the robot's own hand is rendered in its place, then stereo is re-run.</div>
+      </div>
+    </div>
+    <div class="rollout">
+      <video data-src="static/videos/touch_ot_map.mp4" poster="static/videos/touch_ot_map.jpg" muted loop playsinline preload="none" aria-label="Animation of the joint thumb-index transport from the human to the robot force regime"></video>
+      <div class="meta">
+        <div class="t">Touch<span class="tag speed">signal space</span></div>
+        <div class="d">Glove forces are mapped onto the robot's force distribution, in the robot's own units.</div>
+      </div>
+    </div>
+  </div>
+
+  <figure class="tall">
+    <img src="static/images/splash.jpg" alt="Human demonstrations with a tactile glove and robot demonstrations on a tactile robot hand are brought into a shared representation, then deployed on the robot.">
+    <figcaption><b>One dataset from two embodiments.</b> Glove demonstrations (<span class="c-blue">blue</span>) and
+    robot demonstrations (<span class="c-green">green</span>) are aligned into a single co-training set, and the
+    resulting policy runs on the robot.</figcaption>
+  </figure>
+
+  <p class="prose">Four components: three erase a different part of the embodiment gap, and the fourth consumes the result.</p>
 
   <div class="cards">
     <div class="card"><div class="n">Component 1</div><div class="t">Kinematic retargeting</div>
@@ -420,12 +425,7 @@
     Taxel layouts differ, load is shared differently between fingers, and peak forces differ by up to 3&times;.</figcaption>
   </figure>
 
-  <figure>
-    <video data-src="static/videos/touch_ot_map.mp4" poster="static/videos/touch_ot_map.jpg" muted loop playsinline preload="none" aria-label="Animation of the joint thumb-index transport from the human to the robot force regime"></video>
-    <figcaption><b>The map in action.</b> Each in-contact human (thumb, index) pair is sent to a convex mix of robot
-    samples, so the mapped grip (<span style="color:#8e44ad">purple</span>) settles onto the robot regime
-    (<span class="c-blue">blue</span>) while zero force stays zero.</figcaption>
-  </figure>
+
 
   <h3>Does the alignment actually work?</h3>
   <p class="prose">We check it directly against the robot distribution with standard two-sample statistics, on held-out
@@ -467,11 +467,7 @@
     the robot (<span class="c-green">green</span>) observes at deployment.</figcaption>
   </figure>
 
-  <figure>
-    <video data-src="static/videos/vision_pipeline.mp4" poster="static/videos/vision_pipeline.jpg" muted loop playsinline preload="none" aria-label="Visual alignment pipeline: raw capture, scene blanked with the robot hand posed, and the resulting human versus robot demonstration"></video>
-    <figcaption><b>The pipeline, step by step.</b> Raw capture, the scene blanked with the robot hand posed at the
-    tracked wrist, and the resulting human demonstration next to a robot demonstration.</figcaption>
-  </figure>
+
 
   <h3>Is the composited hand actually measured?</h3>
   <p class="prose">Yes, and it is measurable. Mesh points inserted straight into a real cloud stay separable from sensed points
