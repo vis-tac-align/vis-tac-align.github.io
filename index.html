@@ -426,25 +426,25 @@
   <h2>How do we align vision?</h2><div class="rule"></div>
   <p class="prose">The human hand is erased from both stereo views and the robot's hand mesh, painted with real robot pixels,
   is composited in its place. Stereo is then run <em>again</em>, so the inserted hand carries the same sensor noise as
-  real robot clouds instead of looking pasted in.</p>
+  real robot point clouds instead of looking pasted in.</p>
 
   <figure>
     <img src="static/images/visual_alignment.jpg" alt="Both streams lifted to 3D; the human hand is replaced with a posed, coloured robot-hand mesh and re-stereoed.">
     <figcaption><b>Visual alignment.</b> Both streams are lifted to 3D and share the same crops. For human
     demonstrations (<span class="c-blue">blue</span>), the segmented hand is replaced by a posed robot-hand mesh,
-    coloured and reprojected into the image (<span class="c-red">red</span>), so the resulting cloud matches what
+    coloured and reprojected into the image (<span class="c-red">red</span>), so the resulting point cloud matches what
     the robot (<span class="c-green">green</span>) observes at deployment.</figcaption>
   </figure>
 
   <div class="tablewrap">
   <table>
     <caption>Separability is the AUC of a roughness test against real sensed points (0.5 = indistinguishable).
-    Chamfer and F-score compare the human hand cloud with a robot hand cloud at the nearest joint configuration.</caption>
+    Chamfer and F-score compare the human hand point cloud with a robot hand point cloud at the nearest joint configuration.</caption>
     <thead><tr><th>Measure</th><th class="num">Before</th><th class="num">Ours</th></tr></thead>
     <tbody>
       <tr class="best"><td>Separability from sensed points (pasted mesh &rarr; composited)</td><td class="num">0.99</td><td class="num">0.67&ndash;0.76</td></tr>
-      <tr class="best"><td>Chamfer distance (glove cloud &rarr; composited)</td><td class="num">13.3 mm</td><td class="num">10.2 mm</td></tr>
-      <tr class="best"><td>F-score at 10 mm (glove cloud &rarr; composited)</td><td class="num">0.40</td><td class="num">0.59</td></tr>
+      <tr class="best"><td>Chamfer distance (glove point cloud &rarr; composited)</td><td class="num">13.3 mm</td><td class="num">10.2 mm</td></tr>
+      <tr class="best"><td>F-score at 10 mm (glove point cloud &rarr; composited)</td><td class="num">0.40</td><td class="num">0.59</td></tr>
     </tbody>
   </table>
   </div>
@@ -586,7 +586,7 @@
   guarantees that hold by construction, and quantifying that trade-off is the most immediate item of future
   work.</p></details>
 
-  <details><summary>Why re-run stereo instead of just pasting the robot hand into the cloud?</summary>
+  <details><summary>Why re-run stereo instead of just pasting the robot hand into the point cloud?</summary>
   <p class="prose">Because a pasted mesh is not a measurement. Its points are noise-free, uniformly dense, and cover surfaces a
   single-view sensor could never see. A simple roughness test separates them from real sensed points almost
   perfectly, at <span class="c-red">0.99</span> area under the curve, which means a policy can learn that shortcut too. Running stereo on
