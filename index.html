@@ -205,7 +205,7 @@
   summary::-webkit-details-marker{display:none}
   summary::before{content:"+"; color:var(--text2); font-weight:400; flex:none}
   details[open] summary::before{content:"-"}
-  details p{margin:12px 0 2px; padding-left:24px; font-size:16px; color:var(--text2)}
+  details p{margin:12px 0 2px; padding-left:24px; font-size:16px; color:var(--text)}
 
   footer{border-top:1px solid var(--border); margin-top:clamp(56px,8vh,96px);
          padding:28px 0 56px; font-size:14px; color:var(--text2); text-align:center}
@@ -214,7 +214,92 @@
   .c-green{color:var(--green); font-weight:700}
   .c-red{color:var(--red2); font-weight:700}
 
+  /* numbered section label above each heading */
+  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
+           color:var(--g2); margin:0 0 10px}
+
+  /* hero: the drill ablation as three steps */
+  .ladder{display:flex; gap:10px; align-items:stretch; justify-content:center; max-width:920px; margin:18px auto 0}
+  .ladder .step{flex:1 1 0; min-width:0; background:var(--surface); border:1px solid var(--border);
+                border-radius:14px; padding:12px 14px; text-align:left}
+  .ladder .step .v{font-size:26px; font-weight:700; letter-spacing:-.02em; line-height:1.1;
+                   font-variant-numeric:tabular-nums}
+  .ladder .step .v small{font-size:14px; font-weight:400; color:var(--text2)}
+  .ladder .step.down .v{color:var(--red2)}
+  .ladder .step.up .v{color:var(--green)}
+  .ladder .step .l{font-size:13.5px; color:var(--text2); margin-top:4px; line-height:1.4}
+  .ladder .step .l b{color:var(--text)}
+  .ladder .arrow{align-self:center; color:var(--text2); font-size:22px; flex:none}
+
+  /* hero: splash figure with four short checks under it */
+  .hero-splash{max-width:1000px; margin:0 auto 44px}
+  .hero-splash figure{margin:0 auto; max-width:560px}
+  /* light: transparent cut-out on the page gradient; dark: the opaque card, since the figure's black text needs a light backdrop */
+  .hero-splash .light img{background:none; border:0; border-radius:0; box-shadow:none}
+  .hero-splash .dark{display:none; background:#fff}
+  :root[data-theme="dark"] .hero-splash .light{display:none}
+  :root[data-theme="dark"] .hero-splash .dark{display:block}
+  .checks{list-style:none; margin:22px auto 0; padding:0; max-width:760px;
+          display:grid; grid-template-columns:1fr 1fr; gap:12px 28px}
+  .checks li{display:flex; gap:10px; align-items:flex-start; text-align:left;
+             font-size:16px; font-weight:700; line-height:1.4; color:var(--text)}
+  .checks svg{flex:none; width:19px; height:19px; margin-top:2px; fill:none; stroke:var(--green);
+              stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round}
   @media (max-width:620px){
+    .checks{grid-template-columns:1fr; gap:10px}
+  }
+
+  /* "play both from start" on a comparison pair */
+  .pairbar{display:flex; justify-content:flex-end; margin:14px 0 -16px}
+  .hero-compare .pairbar{justify-content:center; margin:10px 0 0}
+  .sync{display:inline-flex; align-items:center; gap:8px; background:var(--surface); color:var(--text);
+        border:1px solid var(--border); border-radius:980px; padding:6px 14px 6px 12px; font:inherit;
+        font-size:14px; cursor:pointer; transition:all var(--fast)}
+  .sync:hover{border-color:var(--accent); color:var(--accent)}
+  .sync svg{width:12px; height:12px; fill:currentColor}
+
+  /* bar charts: one group per condition, one bar per policy */
+  .chart{background:var(--surface); border:1px solid var(--border); border-radius:16px;
+         padding:36px 18px 14px; margin:22px 0; overflow-x:auto; -webkit-overflow-scrolling:touch}
+  .chart .groups{display:flex; gap:clamp(22px,4vw,56px); align-items:flex-end; justify-content:space-evenly;
+                 min-width:520px}
+  .chart .group{flex:1 1 0; min-width:0}
+  .chart .bars, .chart .labels{display:flex; gap:14px; justify-content:center; padding:0 6px}
+  .chart .bars{align-items:flex-end; height:160px; border-bottom:1.5px solid var(--border)}
+  .chart .bars .col{height:100%; align-items:flex-end}
+  .chart .col{flex:1 1 0; max-width:92px; min-width:40px; display:flex; justify-content:center}
+  .chart .bar{width:min(100%,60px); position:relative; border-radius:6px 6px 0 0;
+              background:color-mix(in srgb, var(--text2) 42%, transparent)}
+  .chart .bar.ours{background:var(--grad)}
+  .chart .bar.ablate{background:color-mix(in srgb, var(--red2) 48%, transparent)}
+  .chart .bar .v{position:absolute; bottom:100%; left:-20px; right:-20px; text-align:center; margin-bottom:4px;
+                 font-size:14px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums}
+  .chart .labels .col{font-size:11.5px; line-height:1.25; color:var(--text2); text-align:center;
+                      padding-top:7px; min-height:38px; align-items:flex-start}
+  .chart .glabel{margin-top:6px; font-size:14px; font-weight:700; text-align:center; line-height:1.3}
+  .chart .legend{display:flex; gap:18px; flex-wrap:wrap; font-size:13px; color:var(--text2);
+                 margin-top:16px; min-width:520px}
+  .chart .legend i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;
+                   vertical-align:-1px; background:color-mix(in srgb, var(--text2) 42%, transparent)}
+  .chart .legend i.ours{background:var(--grad)}
+  .chart .legend i.ablate{background:color-mix(in srgb, var(--red2) 48%, transparent)}
+  .chart .axis{font-size:12px; color:var(--text2); margin-top:6px; min-width:520px}
+  .takeaway{border-left:3px solid var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface));
+            padding:12px 16px; border-radius:0 12px 12px 0; margin:14px 0 6px; font-size:16px; line-height:1.5;
+            max-width:900px}
+  .takeaway b{color:var(--text)}
+
+  .limits{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin:22px 0 0}
+  .limits .card p{color:var(--text)}
+
+  @media (max-width:620px){
+    .ladder{flex-direction:column; gap:8px}
+    .ladder .arrow{transform:rotate(90deg); font-size:18px; line-height:1}
+    .ladder .step .v{font-size:22px}
+    .pairbar{justify-content:center; margin-bottom:-12px}
+    .chart{padding:32px 12px 12px; border-radius:12px;
+           mask-image:linear-gradient(90deg,#000 91%,transparent);
+           -webkit-mask-image:linear-gradient(90deg,#000 91%,transparent)}
     body{font-size:16px}
     nav .links{gap:18px}
     .tablewrap{padding:4px 12px 12px; border-radius:12px;
@@ -239,6 +324,7 @@
     <a href="#touch">Touch</a>
     <a href="#vision">Vision</a>
     <a href="#results">Results</a>
+    <a href="#limitations">Limitations</a>
     <a href="#qa">Q&amp;A</a>
   </div>
   <button id="theme" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
@@ -261,7 +347,22 @@
 </header>
 
 <div class="hero-compare">
-  <div class="rollouts">
+  <div class="hero-splash">
+    <figure>
+      <picture class="light">
+        <source type="image/webp" srcset="static/images/splash_hero.webp">
+        <img src="static/images/splash_hero.jpg" alt="Human demonstrations with a tactile glove and robot demonstrations with a tactile hand are aligned into one co-training dataset of point clouds, tactile signals and actions; the co-trained policy reaches, grasps and lifts a drill.">
+      </picture>
+      <img class="dark" src="static/images/splash_hero.jpg" loading="lazy" alt="Human demonstrations with a tactile glove and robot demonstrations with a tactile hand are aligned into one co-training dataset of point clouds, tactile signals and actions; the co-trained policy reaches, grasps and lifts a drill.">
+    </figure>
+    <ul class="checks">
+      <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Aligned in vision, touch and kinematics</li>
+      <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>One force per finger, glove and robot</li>
+      <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Robot hand rendered into human point clouds</li>
+      <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Up to +70 points from human data</li>
+    </ul>
+  </div>
+  <div class="rollouts" id="pair-hero">
     <div class="rollout">
       <video data-src="static/videos/drill_ours.mp4" poster="static/videos/drill_ours.jpg" muted loop playsinline preload="none" aria-label="Robot hand lifting a drill while holding the trigger, co-trained policy"></video>
       <div class="meta">
@@ -277,11 +378,19 @@
       </div>
     </div>
   </div>
+  <div class="pairbar"><button class="sync" type="button" data-pair="pair-hero"><svg viewBox="0 0 12 12"><path d="M2 1.5v9l8-4.5z"/></svg>Play both from start</button></div>
   <p class="hero-cap">Drill task: grasp, pull the trigger, and lift while holding it. Adding 26 aligned human
   demonstrations raises success from <b>50%</b> to <b>70%</b>.</p>
-  <p class="lead prose hero-lead">Human demonstrations are cheap, but a robot can only learn from them if they <b>look,
-  move and feel</b> like its own. VisTacAlign aligns human demonstrations to the robot in vision, touch and
-  kinematics, so a few robot demonstrations go much further on force-critical dexterous tasks.</p>
+  <div class="ladder" aria-label="Drill success with 10 robot demonstrations, as human data is added">
+    <div class="step"><div class="v">35<small>%</small></div>
+      <div class="l"><b>10 robot demos</b>, no human data</div></div>
+    <div class="arrow" aria-hidden="true">&rarr;</div>
+    <div class="step down"><div class="v">30<small>%</small></div>
+      <div class="l"><b>+ 26 human demos</b> without touch. Worse than no human data.</div></div>
+    <div class="arrow" aria-hidden="true">&rarr;</div>
+    <div class="step up"><div class="v">55<small>%</small></div>
+      <div class="l"><b>+ the same 26</b> with aligned touch (VisTacAlign)</div></div>
+  </div>
   <div class="stats hero-stats">
     <div class="stat"><div class="v">10 <small>&rarr;</small> 80<small>%</small></div>
       <div class="l">Lego task success, robot-only vs co-trained</div></div>
@@ -297,6 +406,7 @@
 
 
 <section id="overview">
+  <div class="eyebrow">01 / Motivation</div>
   <h2>Why human demonstrations?</h2><div class="rule"></div>
   <div class="rollouts">
     <div class="rollout">
@@ -319,6 +429,7 @@
 </section>
 
 <section id="method">
+  <div class="eyebrow">02 / Method</div>
   <h2>How does VisTacAlign work?</h2><div class="rule"></div>
   <div class="rollouts">
     <div class="rollout">
@@ -387,6 +498,7 @@
 </section>
 
 <section id="touch">
+  <div class="eyebrow">03 / Touch</div>
   <h2>How do we align touch?</h2><div class="rule"></div>
   <p class="prose">The glove and the robot fingertips share nothing: different layout, gain and range. We reduce each to one
   force per finger and fit a single static map that carries the human distribution onto the robot's, in the robot's
@@ -423,6 +535,7 @@
 </section>
 
 <section id="vision">
+  <div class="eyebrow">04 / Vision</div>
   <h2>How do we align vision?</h2><div class="rule"></div>
   <p class="prose">The human hand is erased from both stereo views and the robot's hand mesh, painted with real robot pixels,
   is composited in its place. Stereo is then run <em>again</em>, so the inserted hand carries the same sensor noise as
@@ -451,6 +564,7 @@
 </section>
 
 <section id="results">
+  <div class="eyebrow">05 / Results</div>
   <h2>How well does it work?</h2><div class="rule"></div>
   <p class="prose">Three real-world tasks where success depends on force. <span class="kbd">26H10R</span> means 26 human
   and 10 robot demonstrations.</p>
@@ -459,6 +573,11 @@
   <p class="prose">Rollouts are at the <a href="#top">top of the page</a>. From 10 robot demonstrations, adding 26
   <em>touchless</em> human demonstrations lowers success to <span class="c-red">30%</span>. The same demonstrations
   with aligned touch raise it to <span class="c-green">55%</span>.</p>
+  <div class="chart" data-chart="drill" aria-label="Drill lift success per policy"></div>
+  <p class="takeaway"><b>Touch is the difference.</b> With 10 robot demonstrations, the same 26 human demonstrations
+  hurt without aligned touch (35 &rarr; 30%) and help with it (&rarr; 55%). With 26 robot demonstrations they add
+  20 points.</p>
+  <details class="more"><summary>Full subtask table</summary>
   <div class="tablewrap">
   <table>
     <caption>Subtask success rate (%), 20 rollouts per policy. Lift is overall task success. Obs. is the visual
@@ -476,11 +595,13 @@
     </tbody>
   </table>
   </div>
+  </details>
 
   <h3>Strawberry: touch regulates force</h3>
   <p class="prose">Pluck a strawberry held by a magnet: hard enough to beat the magnet, gentle enough not to crush it.
   Without touch the policy fails on large fruit entirely.</p>
-  <div class="rollouts">
+  <div class="pairbar"><button class="sync" type="button" data-pair="pair-strawberry"><svg viewBox="0 0 12 12"><path d="M2 1.5v9l8-4.5z"/></svg>Play both from start</button></div>
+  <div class="rollouts" id="pair-strawberry">
     <div class="rollout">
       <video data-src="static/videos/strawberry_ours.mp4" poster="static/videos/strawberry_ours.jpg" muted loop playsinline preload="none" aria-label="Robot hand plucking a strawberry, co-trained tactile policy"></video>
       <div class="meta">
@@ -497,6 +618,10 @@
     </div>
   </div>
 
+  <div class="chart" data-chart="strawberry" aria-label="Strawberry plucking success per fruit size"></div>
+  <p class="takeaway"><b>Touch regulates force.</b> The co-trained tactile policy wins at every size, and on large
+  fruit it is the difference between <span class="c-red">0%</span> and <span class="c-green">70%</span>.</p>
+  <details class="more"><summary>Full table</summary>
   <div class="tablewrap">
   <table>
     <caption>Plucking success (%) per fruit size, ten rollouts per cell.</caption>
@@ -508,6 +633,7 @@
     </tbody>
   </table>
   </div>
+  </details>
 
   <details class="more"><summary>Grip force by fruit size</summary>
   <figure class="narrow">
@@ -522,7 +648,8 @@
   <h3>Lego: the recipe scales, and needs visual alignment</h3>
   <p class="prose">Pick, align, push until it snaps, retreat. Human data takes success from <span class="c-red">10%</span>
   to <span class="c-green">80%</span>, and without the visual alignment the push and retreat stages collapse.</p>
-  <div class="rollouts">
+  <div class="pairbar"><button class="sync" type="button" data-pair="pair-lego"><svg viewBox="0 0 12 12"><path d="M2 1.5v9l8-4.5z"/></svg>Play both from start</button></div>
+  <div class="rollouts" id="pair-lego">
     <div class="rollout">
       <video data-src="static/videos/lego_ours.mp4" poster="static/videos/lego_ours.jpg" muted loop playsinline preload="none" aria-label="Robot hand stacking a Lego brick, full method"></video>
       <div class="meta">
@@ -539,6 +666,10 @@
     </div>
   </div>
 
+  <div class="chart" data-chart="lego" aria-label="Lego task success per policy"></div>
+  <p class="takeaway"><b>The recipe scales, and vision alignment carries it.</b> Success grows with robot demonstrations
+  (40 &rarr; 60 &rarr; 80%). Without Rp2d the same data gives 10% and 25%, and without touch 70%.</p>
+  <details class="more"><summary>Full subtask table</summary>
   <div class="tablewrap">
   <table>
     <caption>Subtask success rate (%) across 20 trials. Top block: a robot-only baseline and the full method with
@@ -557,12 +688,14 @@
     </tbody>
   </table>
   </div>
+  </details>
 </section>
 
 
 
 
 <section id="hardware">
+  <div class="eyebrow">06 / Hardware</div>
   <h2>Hardware</h2><div class="rule"></div>
   <figure>
     <img src="static/images/hardware_overview.jpg" alt="Benchtop setup: tactile glove and wrist tracker for humans, tactile robot hand on a 7-DoF arm, stereo camera observing the workspace.">
@@ -573,7 +706,26 @@
   </figure>
 </section>
 
+<section id="limitations">
+  <div class="eyebrow">07 / Limitations</div>
+  <h2>Limitations</h2><div class="rule"></div>
+  <div class="limits">
+    <div class="card"><div class="t">Per-task tactile map</div>
+      <p>The force map is fitted per task from unpaired samples, so each new task still needs a short robot recording
+      of its contacts.</p></div>
+    <div class="card"><div class="t">One force per finger</div>
+      <p>Reducing a fingertip to a single normal force discards the taxel layout and shear, which likely matters for
+      in-hand manipulation and slip.</p></div>
+    <div class="card"><div class="t">Short-horizon tasks</div>
+      <p>The three tasks are short and largely quasi-static. Long-horizon and dynamic manipulation are untested.</p></div>
+    <div class="card"><div class="t">No learned-latent baseline</div>
+      <p>We argue for signal-space alignment on interpretability and guarantees by construction, and do not compare
+      head-to-head against alignment in a learned latent space.</p></div>
+  </div>
+</section>
+
 <section id="qa">
+  <div class="eyebrow">08 / Q&amp;A</div>
   <h2>Q&amp;A</h2><div class="rule"></div>
 
   <details><summary>Why align in signal space instead of a learned latent space?</summary>
@@ -596,11 +748,6 @@
   <p class="prose">Yes. The tactile map is fitted per task from unpaired force samples, so a short robot recording of the
   task's contacts is still needed. The result is not that human data replaces robot data, but that it
   substantially raises what a small number of robot demonstrations is worth.</p></details>
-
-  <details><summary>What are the main limitations?</summary>
-  <p class="prose">The tactile map is fitted per task. Reducing a fingertip to one normal force discards the taxel layout and
-  shear, which likely matters for in-hand manipulation and slip. The tasks are short-horizon and largely
-  quasi-static. And we do not compare against alignment in a learned latent space.</p></details>
 
   <details><summary>How fast does the policy run?</summary>
   <p class="prose">The policy has 23.5M parameters. At deployment, stereo runs at 20&nbsp;Hz, the glove at 60&nbsp;Hz and the
@@ -630,6 +777,60 @@
     },{rootMargin:'200px 0px'});
     vids.forEach(function(v){ io.observe(v); });
   })();
+</script>
+<script>
+  // Bar charts for the three tasks, built from the same numbers as the tables below them.
+  (function(){
+    var G={
+      drill:{axis:'Lift success (%), 20 rollouts per policy. Point-cloud observations unless noted.',
+        legend:[['', 'Robot only'],['ours','With aligned human data'],['ablate','Human data without touch']],
+        groups:[
+          {label:'26 robot demos', bars:[['', 'RGB only',35],['', 'Robot only',50],['ours','+ 26 human',70]]},
+          {label:'10 robot demos', bars:[['', 'Robot only',35],['ablate','+ 26 human, no touch',30],['ours','+ 26 human, touch',55]]}]},
+      strawberry:{axis:'Plucking success (%), ten rollouts per cell.',
+        legend:[['', 'Robot only, no touch'],['ours','Co-train + tactile']],
+        groups:[
+          {label:'Small fruit (20–25 mm)', bars:[['', 'Robot only',60],['ours','Ours',90]]},
+          {label:'Medium (30–35 mm)', bars:[['', 'Robot only',70],['ours','Ours',80]]},
+          {label:'Large (40–45 mm)', bars:[['', 'Robot only',0],['ours','Ours',70]]}]},
+      lego:{axis:'Task success (%) = retreat stage completed, 20 trials per policy. Every policy but the robot-only one also uses 50 human demonstrations.',
+        legend:[['', 'Robot only'],['ours','Full method'],['ablate','Ablation']],
+        groups:[
+          {label:'Full method, more robot demos', bars:[['', 'Robot only (30R)',10],['ours','50H10R',40],['ours','50H20R',60],['ours','50H30R',80]]},
+          {label:'Ablations', bars:[['ablate','10R, no Rp2d',10],['ablate','20R, no Rp2d',25],['ablate','30R, no touch',70]]}]}
+    };
+    function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+    document.querySelectorAll('[data-chart]').forEach(function(el){
+      var c=G[el.dataset.chart]; if(!c) return;
+      var h='<div class="groups">';
+      c.groups.forEach(function(g){
+        h+='<div class="group"><div class="bars">';
+        g.bars.forEach(function(b){
+          h+='<div class="col"><div class="bar '+b[0]+'" style="height:'+Math.max(b[2],1.5)+'%"><span class="v">'+b[2]+'</span></div></div>';
+        });
+        h+='</div><div class="labels">';
+        g.bars.forEach(function(b){ h+='<div class="col">'+esc(b[1])+'</div>'; });
+        h+='</div><div class="glabel">'+esc(g.label)+'</div></div>';
+      });
+      h+='</div><div class="legend">';
+      c.legend.forEach(function(l){ h+='<span><i class="'+l[0]+'"></i>'+esc(l[1])+'</span>'; });
+      h+='</div><div class="axis">'+esc(c.axis)+'</div>';
+      el.innerHTML=h;
+    });
+  })();
+  // "Play both from start": restart the two clips of a comparison pair together.
+  document.querySelectorAll('.sync').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var pair=document.getElementById(btn.dataset.pair); if(!pair) return;
+      var vids=Array.prototype.slice.call(pair.querySelectorAll('video'));
+      vids.forEach(function(v){ if(!v.src) v.src=v.dataset.src; v.pause(); });
+      Promise.all(vids.map(function(v){
+        return v.readyState>=2 ? Promise.resolve() : new Promise(function(res){ v.addEventListener('loadeddata',res,{once:true}); v.load(); });
+      })).then(function(){
+        vids.forEach(function(v){ v.currentTime=0; var p=v.play(); if(p&&p.catch) p.catch(function(){}); });
+      });
+    });
+  });
 </script>
 <script>
   document.getElementById('theme').addEventListener('click', function(){
