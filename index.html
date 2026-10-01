@@ -13,30 +13,23 @@
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg:#e8f0fb; --surface:#fbfdff; --text:#1d1d1f; --text2:#86868b;
-    --accent:#0071e3; --accent-hover:#0077ed;
-    --card:#ffffff; --border:#cfdcef;
-    --gold:#c5960c; --red:#ff3b30; --red2:#e51a1a; --green:#1fa15a;
-    --sans:-apple-system,BlinkMacSystemFont,'SF Pro Display','Lato','Helvetica Neue',sans-serif;
-    --mono:'SF Mono','Fira Code','Consolas',monospace;
-    --fast:.3s ease;
-    --g1:#0062d6; --g2:#2f92ff; --g3:#00c2ff;
-    --grad:linear-gradient(115deg,var(--g1) 0%,var(--g2) 46%,var(--g3) 100%);
-    --wash:radial-gradient(1100px 420px at 50% -60px,rgba(0,113,227,.13),transparent 70%);
+    --bg:#e8f0fb; --ink:#2e2d29; --muted:#5d6370; --line:#cfdcef; --surface:#fbfdff;
+    --accent:#0062d6; --g1:#0062d6; --g2:#2f92ff; --g3:#00c2ff;
+    --grad:linear-gradient(115deg,var(--g1) 0%,var(--g2) 46%,var(--g3) 100%); --base:#b9b6ae; --ablate:#d9a59c; --green:#2f8f5b; --red:#c0392b; --orange:#d98324;
+    --sans:'DM Sans',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
+    --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    --col:720px;
   }
-  /* light is the default; dark is opt-in via the nav toggle */
+  /* light is the default; dark is opt-in via the header toggle */
   :root[data-theme="dark"]{
-    --bg:#060a14; --surface:#0f1622; --text:#f5f5f7; --text2:#a1a1a6;
-    --accent:#2997ff; --accent-hover:#64b5f6;
-    --card:#131519; --border:#27324a; --green:#30d158;
-  
-    --g1:#2997ff; --g2:#5ac8fa; --g3:#64d2ff;
-    --wash:radial-gradient(1100px 420px at 50% -60px,rgba(41,151,255,.20),transparent 70%);
+    --bg:#060a14; --ink:#f5f5f7; --muted:#a1a1a6; --line:#27324a; --surface:#0f1622;
+    --accent:#2997ff; --g1:#2997ff; --g2:#5ac8fa; --g3:#64d2ff; --base:#5d5f64; --ablate:#a2675f; --green:#5fd08f; --red:#ff7b6b; --orange:#f0a04b;
   }
   *{box-sizing:border-box}
+  /* blue washes behind the whole page */
   body::before{content:""; position:fixed; inset:0; z-index:-2; pointer-events:none;
     background:
       radial-gradient(900px 620px at 12% -8%, rgba(0,113,227,.26), transparent 64%),
@@ -47,321 +40,241 @@
       radial-gradient(900px 620px at 12% -8%, rgba(41,151,255,.34), transparent 64%),
       radial-gradient(760px 560px at 92% 12%, rgba(100,210,255,.22), transparent 66%),
       radial-gradient(1000px 700px at 50% 108%, rgba(41,151,255,.24), transparent 68%);}
-  html{scroll-behavior:smooth; scroll-padding-top:60px}
-  body{margin:0; background:var(--bg); color:var(--text);
-       font-family:var(--sans); font-size:17px; font-weight:400; line-height:1.65;
+  html{scroll-behavior:smooth; scroll-padding-top:28px}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:15.5px;
+       font-weight:400; line-height:1.7; font-synthesis:none;
        -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale}
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  p{margin:0 0 16px}
+  b{font-weight:600}
 
-  nav{position:sticky; top:0; z-index:50; background:var(--bg);
-      box-shadow:0 1px 0 rgba(0,113,227,.10);
-      border-bottom:1px solid var(--border)}
-  @supports (backdrop-filter:blur(1px)){
-    nav{background:color-mix(in srgb, var(--bg) 82%, transparent);
-        backdrop-filter:saturate(180%) blur(20px);
-        -webkit-backdrop-filter:saturate(180%) blur(20px)}
-  }
-  nav .inner{max-width:1280px; margin:0 auto; padding:0 clamp(16px,5vw,40px);
-             height:48px; display:flex; gap:16px; align-items:center}
-  nav .links{display:flex; gap:22px; align-items:center; margin-right:auto;
-             overflow-x:auto; scrollbar-width:none; -ms-overflow-style:none;
-             mask-image:linear-gradient(90deg,#000 88%,transparent);
-             -webkit-mask-image:linear-gradient(90deg,#000 88%,transparent)}
-  nav .links::-webkit-scrollbar{display:none}
-  nav .brand{font-weight:700; color:var(--text); letter-spacing:-.2px;
-             white-space:nowrap; flex:none}
-  nav a{color:var(--text2); text-decoration:none; font-size:14px; white-space:nowrap;
-        transition:color var(--fast)}
-  nav a:hover{color:var(--text)}
-  #theme{margin-left:4px; flex:none; background:none; border:1px solid var(--border);
-         color:var(--text2); width:30px; height:30px; border-radius:980px; cursor:pointer;
-         display:grid; place-items:center; padding:0; transition:all var(--fast)}
-  #theme:hover{color:var(--text); border-color:var(--text2)}
+  /* top: accent rule, then brand on the left and links on the right */
+  .topbar{height:3px; background:var(--grad)}
+  .header{display:flex; align-items:center; justify-content:space-between; gap:16px;
+          padding:14px clamp(20px,4.5vw,56px); border-bottom:1px solid var(--line)}
+  .header .brand{font-weight:600; font-size:15px; letter-spacing:-.01em}
+  .header .pills{display:flex; gap:8px; align-items:center; flex-wrap:wrap; justify-content:flex-end}
+  .pill{font-size:13px; font-weight:500; background:var(--surface); color:var(--ink);
+        border-radius:40px; padding:7px 14px; white-space:nowrap}
+  .pill small{font-size:12px; font-weight:400; color:var(--muted)}
+  #theme{flex:none; background:var(--surface); border:0; color:var(--muted); width:32px; height:32px;
+         border-radius:40px; cursor:pointer; display:grid; place-items:center; padding:0}
+  #theme:hover{color:var(--ink)}
   #theme svg{width:15px; height:15px; fill:none; stroke:currentColor; stroke-width:1.9;
              stroke-linecap:round; stroke-linejoin:round}
   #theme .moon{display:none}
   :root[data-theme="dark"] #theme .sun{display:none}
   :root[data-theme="dark"] #theme .moon{display:block}
 
-  .wrap{max-width:1280px; margin:0 auto; padding:0 clamp(20px,5vw,40px)}
-  .grad{background:var(--grad); -webkit-background-clip:text; background-clip:text;
-        color:transparent; -webkit-text-fill-color:transparent}
-  header{position:relative}
-  .prose{max-width:760px}
-  header{text-align:center; padding:clamp(56px,9vh,96px) 0 8px}
-  h1{font-weight:700; letter-spacing:-.02em; line-height:1.15; margin:0 0 10px;
-     font-size:clamp(2rem,5vw,3.2rem)}
-  .sub{font-size:clamp(1.05rem,2.2vw,1.45rem); font-weight:400; line-height:1.3;
-       color:var(--text); margin:0 auto 26px; max-width:860px}
-  .authors{font-size:17px; color:var(--text); margin:0 0 6px}
-  .venue{font-size:15px; color:var(--gold); font-weight:700;
-         letter-spacing:.02em; margin:0 0 24px}
-
-  .pub-links{display:flex; gap:12px; justify-content:center; flex-wrap:wrap}
-  .pub-links a, .pub-links span{display:inline-block; padding:7px 16px;
-        border-radius:980px; border:1px solid var(--accent); color:var(--accent);
-        font-size:15px; text-decoration:none; transition:all var(--fast)}
-  .pub-links a:hover{background:var(--accent); color:#fff}
-  .pub-links span{border-color:var(--border); color:var(--text2)}
-
-  section{padding:clamp(56px,8vh,96px) 0 0}
-  h2{font-weight:700; letter-spacing:-.02em; line-height:1.15;
-     font-size:clamp(1.6rem,3.4vw,2.4rem); margin:0 0 6px}
-  h2 + .rule{height:2px; margin:0 0 22px; border-radius:2px;
-             background:linear-gradient(90deg,var(--g1),var(--g2) 28%,transparent 72%)}
-  h3{font-weight:700; font-size:1.2rem; line-height:1.3; margin:34px 0 8px;
-     color:var(--g1)}
-  p{margin:0 0 16px}
-  a{color:var(--accent)}
-  a:hover{color:var(--accent-hover)}
-
-  figure{margin:26px 0 8px}
-  figure{max-width:920px; margin-left:auto; margin-right:auto}
-  figure img, figure video{width:100%; height:auto; display:block; border-radius:14px;
-             border:1px solid var(--border); background:#fff;
-             box-shadow:0 1px 2px rgba(16,24,40,.04), 0 8px 24px rgba(16,24,40,.06)}
-  figure.narrow{max-width:600px}
-  figure.narrow img{padding:14px}
-  figure.tall{max-width:560px}
-
-  /* hero comparison under the title */
-  .hero-compare{max-width:1000px; margin:8px auto 30px}
-  .hero-compare .rollouts{margin:0; grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
-  .hero-cap{text-align:center; color:var(--text2); font-size:15px; line-height:1.55; margin:14px auto 0; max-width:720px}
-  .hero-cap b{color:var(--text)}
-  .hero-lead{max-width:760px; margin:26px auto 0; text-align:center}
-  .hero-stats{margin-top:22px}
-
-  /* rollout grid */
-  .rollouts{display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-            gap:20px; margin:26px 0}
-  .rollout{background:var(--surface); border:1px solid var(--border);
-           border-radius:16px; overflow:hidden}
-  .rollout video{width:100%; height:auto; display:block;
-                 border-radius:0; border:0; background:#000; aspect-ratio:16/9;
-                 object-fit:cover}
-  .rollout .meta{padding:13px 16px}
-  .rollout .meta .t{font-weight:700; font-size:16px; margin-bottom:3px}
-  .rollout .meta .d{font-size:14px; color:var(--text2); line-height:1.5}
-  .tag{display:inline-block; font-size:12px; font-weight:700; letter-spacing:.04em;
-       padding:2px 8px; border-radius:980px; vertical-align:2px; margin-left:7px}
-  .tag.ok{background:rgba(31,161,90,.14); color:var(--green)}
-  .tag.fail{background:rgba(229,26,26,.13); color:var(--red2)}
-  .tag.speed{background:var(--card); color:var(--text2); border:1px solid var(--border)}
-  figcaption{font-size:15px; color:var(--text2); margin-top:12px; line-height:1.55;
-             max-width:900px}
-  figcaption b{color:var(--text); font-weight:700}
-
-  .lead{font-size:19px}
-  .kbd{font-family:var(--mono); font-size:.88em; background:var(--surface);
-       border:1px solid var(--border); border-radius:6px; padding:2px 6px}
-
-  .cards{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
-         gap:16px; margin:26px 0}
-  .card{background:var(--surface); border:1px solid var(--border);
-        border-radius:16px; padding:20px 22px}
-  .card .n{font-size:12px; color:var(--g2); text-transform:uppercase;
-           letter-spacing:.08em; font-weight:700; margin-bottom:6px}
-  .card .t{font-weight:700; color:var(--text); margin-bottom:6px; font-size:17px}
-  .card p{font-size:15px; margin:0; color:var(--text2); line-height:1.55}
-
-  .tablewrap{overflow-x:auto; margin:22px 0; -webkit-overflow-scrolling:touch;
-             background:var(--surface); border:1px solid var(--border);
-             border-radius:14px; padding:6px 18px 14px}
-  table{border-collapse:collapse; width:100%; font-size:15px; min-width:440px}
-  th,td{padding:10px 12px; text-align:left; border-bottom:1px solid var(--border)}
-  tbody tr:last-child td{border-bottom:0}
-  th{font-weight:700; color:var(--text); white-space:nowrap;
-     border-bottom:1.5px solid var(--text2)}
-  td.num, th.num{text-align:right; font-variant-numeric:tabular-nums}
-  tr.best td{background:color-mix(in srgb, var(--green) 9%, transparent)}
-  tr.best td.num{font-weight:700; color:var(--green)}
-  caption{caption-side:bottom; text-align:left; font-size:14px;
-          color:var(--text2); padding-top:12px; line-height:1.5;
-          position:sticky; left:0; width:min(100%,calc(100vw - 76px))}
-
-  .pull{border-left:3px solid transparent;
-        border-image:var(--grad) 1;
-        padding:4px 0 4px 20px;
-        margin:28px 0; color:var(--text); font-size:20px; line-height:1.5; max-width:800px}
-
-  .stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-         gap:16px; margin:28px 0}
-  .stat{background:var(--surface); border:1px solid var(--border);
-        border-radius:16px; padding:22px 16px; text-align:center}
-  .stat .v{font-size:30px; font-weight:700; letter-spacing:-.02em; line-height:1.1;
-           background:var(--grad); -webkit-background-clip:text; background-clip:text;
-           color:transparent; -webkit-text-fill-color:transparent}
-  .stat .v small{font-size:16px; font-weight:400; color:var(--text2);
-                 -webkit-text-fill-color:var(--text2)}
-  .stat .l{font-size:14px; color:var(--text2); margin-top:8px; line-height:1.45}
-
-  details{border-top:1px solid var(--border); padding:16px 0}
-  details.more{border:0; padding:6px 0; margin:6px 0 10px}
-  details.more summary{color:var(--accent); font-weight:600; font-size:15px}
-  #qa details:last-of-type{border-bottom:1px solid var(--border)}
-  summary{cursor:pointer; font-weight:700; color:var(--text); list-style:none;
-          display:flex; gap:12px; align-items:flex-start; transition:color var(--fast)}
-  summary:hover{color:var(--accent)}
-  summary::-webkit-details-marker{display:none}
-  summary::before{content:"+"; color:var(--text2); font-weight:400; flex:none}
-  details[open] summary::before{content:"-"}
-  details p{margin:12px 0 2px; padding-left:24px; font-size:16px; color:var(--text)}
-
-  footer{border-top:1px solid var(--border); margin-top:clamp(56px,8vh,96px);
-         padding:28px 0 56px; font-size:14px; color:var(--text2); text-align:center}
-
-  .c-blue{color:var(--accent); font-weight:700}
-  .c-green{color:var(--green); font-weight:700}
-  .c-red{color:var(--red2); font-weight:700}
-
-  /* numbered section label above each heading */
-  .eyebrow{font-family:var(--mono); font-size:12px; letter-spacing:.14em; text-transform:uppercase;
-           color:var(--g2); margin:0 0 10px}
-
-  /* hero: the drill ablation as three steps */
-  .ladder{display:flex; gap:10px; align-items:stretch; justify-content:center; max-width:920px; margin:18px auto 0}
-  .ladder .step{flex:1 1 0; min-width:0; background:var(--surface); border:1px solid var(--border);
-                border-radius:14px; padding:12px 14px; text-align:left}
-  .ladder .step .v{font-size:26px; font-weight:700; letter-spacing:-.02em; line-height:1.1;
-                   font-variant-numeric:tabular-nums}
-  .ladder .step .v small{font-size:14px; font-weight:400; color:var(--text2)}
-  .ladder .step.down .v{color:var(--red2)}
-  .ladder .step.up .v{color:var(--green)}
-  .ladder .step .l{font-size:13.5px; color:var(--text2); margin-top:4px; line-height:1.4}
-  .ladder .step .l b{color:var(--text)}
-  .ladder .arrow{align-self:center; color:var(--text2); font-size:22px; flex:none}
-
-  /* hero: splash figure with four short checks under it */
-  .hero-splash{max-width:1000px; margin:0 auto 44px}
-  .hero-splash figure{margin:0 auto; max-width:560px}
-  /* light: transparent cut-out on the page gradient; dark: the opaque card, since the figure's black text needs a light backdrop */
-  .hero-splash .light img{background:none; border:0; border-radius:0; box-shadow:none}
-  .hero-splash .dark{display:none; background:#fff}
-  :root[data-theme="dark"] .hero-splash .light{display:none}
-  :root[data-theme="dark"] .hero-splash .dark{display:block}
-  .checks{list-style:none; margin:22px auto 0; padding:0; max-width:760px;
-          display:grid; grid-template-columns:1fr 1fr; gap:12px 28px}
-  .checks li{display:flex; gap:10px; align-items:flex-start; text-align:left;
-             font-size:16px; font-weight:700; line-height:1.4; color:var(--text)}
-  .checks svg{flex:none; width:19px; height:19px; margin-top:2px; fill:none; stroke:var(--green);
-              stroke-width:2.6; stroke-linecap:round; stroke-linejoin:round}
-  @media (max-width:620px){
-    .checks{grid-template-columns:1fr; gap:10px}
+  /* chapter list pinned to the left edge on wide screens */
+  #chapters{display:none}
+  @media (min-width:1180px){
+    #chapters{display:block; position:fixed; left:clamp(18px,2.4vw,44px); top:108px; width:150px; z-index:5}
+    #chapters a{display:grid; grid-template-columns:24px 1fr; align-items:baseline; padding:7px 0;
+                font-size:12.5px; line-height:1.35; color:var(--muted)}
+    #chapters a i{font-style:normal; font-size:10.5px; opacity:.75; font-variant-numeric:tabular-nums}
+    #chapters a:hover{color:var(--ink); text-decoration:none}
+    #chapters a.on{color:var(--accent); font-weight:600}
   }
 
-  /* "play both from start" on a comparison pair */
-  .pairbar{display:flex; justify-content:flex-end; margin:14px 0 -16px}
-  .hero-compare .pairbar{justify-content:center; margin:10px 0 0}
-  .sync{display:inline-flex; align-items:center; gap:8px; background:var(--surface); color:var(--text);
-        border:1px solid var(--border); border-radius:980px; padding:6px 14px 6px 12px; font:inherit;
-        font-size:14px; cursor:pointer; transition:all var(--fast)}
-  .sync:hover{border-color:var(--accent); color:var(--accent)}
-  .sync svg{width:12px; height:12px; fill:currentColor}
+  .wrap{max-width:calc(var(--col) + 40px); margin:0 auto; padding:0 20px}
+  header{text-align:center; padding:clamp(40px,7vh,68px) 0 30px}
+  h1{font-weight:500; letter-spacing:-.025em; line-height:1.2; margin:0 0 20px;
+     font-size:clamp(1.7rem,3.6vw,2.3rem); text-wrap:balance}
+  h1 .name, .stat .v{background:var(--grad); -webkit-background-clip:text; background-clip:text;
+                     color:transparent; -webkit-text-fill-color:transparent}
+  .stat .v small{-webkit-text-fill-color:var(--muted)}
+  .authors{font-size:15.5px; margin:0 0 4px}
+  .venue{font-size:13.5px; color:var(--muted); margin:0}
 
-  /* bar charts: one group per condition, one bar per policy */
-  .chart{background:var(--surface); border:1px solid var(--border); border-radius:16px;
-         padding:36px 18px 14px; margin:22px 0; overflow-x:auto; -webkit-overflow-scrolling:touch}
-  .chart .groups{display:flex; gap:clamp(22px,4vw,56px); align-items:flex-end; justify-content:space-evenly;
-                 min-width:520px}
-  .chart .group{flex:1 1 0; min-width:0}
-  .chart .bars, .chart .labels{display:flex; gap:14px; justify-content:center; padding:0 6px}
-  .chart .bars{align-items:flex-end; height:160px; border-bottom:1.5px solid var(--border)}
-  .chart .bars .col{height:100%; align-items:flex-end}
-  .chart .col{flex:1 1 0; max-width:92px; min-width:40px; display:flex; justify-content:center}
-  .chart .bar{width:min(100%,60px); position:relative; border-radius:6px 6px 0 0;
-              background:color-mix(in srgb, var(--text2) 42%, transparent)}
-  .chart .bar.ours{background:var(--grad)}
-  .chart .bar.ablate{background:color-mix(in srgb, var(--red2) 48%, transparent)}
-  .chart .bar .v{position:absolute; bottom:100%; left:-20px; right:-20px; text-align:center; margin-bottom:4px;
-                 font-size:14px; font-weight:700; color:var(--text); font-variant-numeric:tabular-nums}
-  .chart .labels .col{font-size:11.5px; line-height:1.25; color:var(--text2); text-align:center;
-                      padding-top:7px; min-height:38px; align-items:flex-start}
-  .chart .glabel{margin-top:6px; font-size:14px; font-weight:700; text-align:center; line-height:1.3}
-  .chart .legend{display:flex; gap:18px; flex-wrap:wrap; font-size:13px; color:var(--text2);
-                 margin-top:16px; min-width:520px}
-  .chart .legend i{display:inline-block; width:12px; height:12px; border-radius:3px; margin-right:6px;
-                   vertical-align:-1px; background:color-mix(in srgb, var(--text2) 42%, transparent)}
-  .chart .legend i.ours{background:var(--grad)}
-  .chart .legend i.ablate{background:color-mix(in srgb, var(--red2) 48%, transparent)}
-  .chart .axis{font-size:12px; color:var(--text2); margin-top:6px; min-width:520px}
-  .takeaway{border-left:3px solid var(--accent); background:color-mix(in srgb, var(--accent) 8%, var(--surface));
-            padding:12px 16px; border-radius:0 12px 12px 0; margin:14px 0 6px; font-size:16px; line-height:1.5;
-            max-width:900px}
-  .takeaway b{color:var(--text)}
+  .hero figure{margin:0 auto 30px; max-width:520px}
+  .hero figure img{border:0; border-radius:0; background:none}
+  .hero .dark{display:none}
+  :root[data-theme="dark"] .hero .light{display:none}
+  :root[data-theme="dark"] .hero .dark{display:block; background:#fff; border-radius:10px}
+  .checks{margin:0 0 6px; padding:0 0 0 20px}
+  .checks li{margin:0 0 7px; padding-left:4px}
+  .checks li::marker{color:var(--accent)}
 
-  .limits{display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:16px; margin:22px 0 0}
-  .limits .card p{color:var(--text)}
+  section{padding:clamp(44px,7vh,68px) 0 0; margin-top:clamp(44px,7vh,68px); border-top:1px solid var(--line)}
+  .eyebrow{font-size:12px; font-weight:600; letter-spacing:.08em; color:var(--accent); margin:0 0 8px;
+           font-variant-numeric:tabular-nums}
+  h2{font-weight:500; letter-spacing:-.02em; line-height:1.2; color:var(--accent);
+     font-size:clamp(1.5rem,3vw,1.9rem); margin:0 0 20px; text-wrap:balance}
+  h3{font-weight:500; font-size:1.25rem; letter-spacing:-.01em; line-height:1.3; margin:44px 0 10px;
+     color:var(--accent)}
+
+  figure{margin:24px 0 8px}
+  figure img, figure video{width:100%; height:auto; display:block; border-radius:10px;
+                           border:1px solid var(--line); background:#fff}
+  figure.narrow{max-width:520px; margin-left:auto; margin-right:auto}
+  figure.narrow img{padding:12px}
+  figcaption, .hero-cap{font-size:13px; color:var(--muted); margin-top:12px; line-height:1.65}
+  figcaption b, .hero-cap b{color:var(--ink)}
+
+  /* comparison pair: label with a dot above each clip, caption below */
+  .rollouts{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin:18px 0 20px}
+  .rollout{display:flex; flex-direction:column; min-width:0}
+  .rollout .meta{display:contents}
+  .rollout .t{order:-1; font-size:13px; font-weight:600; margin:0 0 8px; display:flex; align-items:center;
+              flex-wrap:wrap; gap:0 7px; line-height:1.4}
+  .rollout .t::before{content:""; flex:none; width:8px; height:8px; border-radius:50%; background:var(--base)}
+  .rollout:has(.tag.ok) .t::before{background:var(--green)}
+  .rollout:has(.tag.fail) .t::before{background:var(--orange)}
+  .rollout .tag{font-weight:400; color:var(--muted)}
+  .rollout .tag::before{content:"\00b7\00a0"}
+  .rollout video{width:100%; height:auto; display:block; aspect-ratio:16/9; object-fit:cover;
+                 border-radius:10px; background:#000}
+  .rollout .d{font-size:13px; color:var(--muted); line-height:1.65; margin-top:10px}
+  .pairbar{display:flex; justify-content:flex-end; margin:14px 0 -10px}
+  .sync{display:inline-flex; align-items:center; gap:7px; background:none; color:var(--muted);
+        border:1px solid var(--line); border-radius:40px; padding:5px 12px 5px 10px; font:inherit;
+        font-size:12.5px; cursor:pointer}
+  .sync:hover{color:var(--accent); border-color:var(--accent)}
+  .sync svg{width:10px; height:10px; fill:currentColor}
+
+  /* key numbers: one flat row, hairlines between */
+  .stats{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); margin:30px 0 0;
+         border:1px solid var(--line); border-radius:10px; background:var(--surface)}
+  .stat{padding:16px 16px 15px; border-left:1px solid var(--line)}
+  .stat:first-child{border-left:0}
+  .stat .v{font-size:22px; font-weight:500; letter-spacing:-.02em; line-height:1.15; color:var(--accent);
+           font-variant-numeric:tabular-nums}
+  .stat .v small{font-size:14px; font-weight:400; color:var(--muted)}
+  .stat .l{font-size:12.5px; color:var(--muted); margin-top:6px; line-height:1.5}
+
+  .kbd{font-family:var(--mono); font-size:.86em; background:var(--surface); border-radius:5px; padding:2px 6px}
+  .pull, .takeaway{border-left:2px solid var(--accent); padding:2px 0 2px 16px; margin:22px 0}
+  .pull{font-size:17px; line-height:1.55}
+
+  .cards, .limits{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin:22px 0}
+  .card{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:16px 18px}
+  .card .n{font-size:11.5px; color:var(--accent); letter-spacing:.06em; font-weight:600; margin-bottom:4px;
+           text-transform:uppercase}
+  .card .t{font-weight:600; margin-bottom:5px}
+  .card p{font-size:13.5px; margin:0; color:var(--muted); line-height:1.65}
+
+  /* expandable detail: a quiet grey bar, like "show data" */
+  details.more{margin:12px 0}
+  details.more > summary{background:var(--surface); border-radius:10px; padding:11px 16px; font-size:13px;
+                         color:var(--ink); font-weight:500}
+  details.more[open] > summary{margin-bottom:14px}
+  summary{cursor:pointer; list-style:none; display:flex; gap:10px; align-items:baseline}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"+"; color:var(--muted); flex:none; width:10px; text-align:center}
+  details[open] > summary::before{content:"\2212"}
+  summary:hover{color:var(--accent)}
+  #qa details{border-top:1px solid var(--line); padding:15px 0}
+  #qa details:last-of-type{border-bottom:1px solid var(--line)}
+  #qa summary{font-weight:500}
+  #qa details p{margin:12px 0 2px; padding-left:20px; font-size:14.5px; color:var(--muted)}
+
+  .tablewrap{overflow-x:auto; margin:18px 0; -webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:440px}
+  th,td{padding:9px 12px 9px 0; text-align:left; border-bottom:1px solid var(--line)}
+  th{font-weight:600; white-space:nowrap; border-bottom-color:var(--ink)}
+  td.num, th.num{text-align:right; padding-right:0; padding-left:12px; font-variant-numeric:tabular-nums}
+  tr.best td.num:last-child{font-weight:600; color:var(--accent)}
+  caption{caption-side:bottom; text-align:left; font-size:12.5px; color:var(--muted); padding-top:10px;
+          line-height:1.6}
+
+  /* horizontal bar charts: one card per condition, one row per policy */
+  .chart{margin:22px 0 10px}
+  .chart .legend{display:flex; gap:6px 18px; flex-wrap:wrap; font-size:12.5px; color:var(--muted); margin-bottom:10px}
+  .chart .legend i{display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:6px;
+                   background:var(--base)}
+  .chart i.ours, .chart .fill.ours{background:var(--grad)}
+  .chart i.ablate, .chart .fill.ablate{background:var(--ablate)}
+  .chart .groups{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px}
+  .chart .group{background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px 16px 16px}
+  .chart .glabel{font-size:12.5px; font-weight:600; margin-bottom:12px}
+  .chart .row{margin-top:11px}
+  .chart .rl{display:flex; justify-content:space-between; gap:10px; font-size:12.5px; line-height:1.3; margin-bottom:5px}
+  .chart .rl span{flex:none; color:var(--muted); font-variant-numeric:tabular-nums}
+  .chart .track{height:12px; background:color-mix(in srgb, var(--line) 55%, transparent); border-radius:3px; overflow:hidden}
+  .chart .fill{height:100%; background:var(--base); border-radius:3px; min-width:2px}
+  .chart .axis{font-size:12px; color:var(--muted); margin-top:10px; line-height:1.6}
+
+  footer{border-top:1px solid var(--line); margin-top:clamp(52px,8vh,84px); padding:26px 0 52px;
+         font-size:12.5px; color:var(--muted); text-align:center}
+
+  .c-blue{color:var(--accent); font-weight:600}
+  .c-green{color:var(--green); font-weight:600}
+  .c-red{color:var(--red); font-weight:600}
 
   @media (max-width:620px){
-    .ladder{flex-direction:column; gap:8px}
-    .ladder .arrow{transform:rotate(90deg); font-size:18px; line-height:1}
-    .ladder .step .v{font-size:22px}
-    .pairbar{justify-content:center; margin-bottom:-12px}
-    .chart{padding:32px 12px 12px; border-radius:12px;
-           mask-image:linear-gradient(90deg,#000 91%,transparent);
-           -webkit-mask-image:linear-gradient(90deg,#000 91%,transparent)}
-    body{font-size:16px}
-    nav .links{gap:18px}
-    .tablewrap{padding:4px 12px 12px; border-radius:12px;
-               mask-image:linear-gradient(90deg,#000 91%,transparent);
-               -webkit-mask-image:linear-gradient(90deg,#000 91%,transparent)}
-    table{min-width:368px; font-size:14px}
-    th,td{padding:9px 8px}
-    caption{mask-image:none; -webkit-mask-image:none}
-    figure.narrow img{padding:8px}
-    .pull{font-size:18px; padding-left:16px}
-    .stat .v{font-size:27px}
+    body{font-size:15px}
+    .rollouts, .cards, .limits{grid-template-columns:1fr}
+    .stats{grid-template-columns:1fr 1fr}
+    .stat:nth-child(odd){border-left:0}
+    .stat:nth-child(n+3){border-top:1px solid var(--line)}
+    .pairbar{justify-content:flex-start}
+    .header .brand{display:none}
+    .header .pills{flex-wrap:nowrap; justify-content:space-between; width:100%}
+    #theme{margin-left:auto}
+    table{min-width:0; font-size:12.5px}
+    th{white-space:normal}
+    th,td{padding:8px 8px 8px 0}
+    td.num, th.num{padding-left:6px}
   }
 </style>
 </head>
 <body>
 
-<nav><div class="inner">
+<div class="topbar"></div>
+<div class="header">
   <span class="brand">VisTacAlign</span>
-  <div class="links">
-    <a href="#overview">Why</a>
-    <a href="#method">Method</a>
-    <a href="#touch">Touch</a>
-    <a href="#vision">Vision</a>
-    <a href="#results">Results</a>
-    <a href="#limitations">Limitations</a>
-    <a href="#qa">Q&amp;A</a>
+  <div class="pills">
+    <span class="pill">Paper <small>&middot; coming soon</small></span>
+    <span class="pill">Code <small>&middot; coming soon</small></span>
+    <button id="theme" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
+      <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
+      <svg class="moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg>
+    </button>
   </div>
-  <button id="theme" type="button" aria-label="Toggle dark mode" title="Toggle dark mode">
-    <svg class="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.2"/><path d="M12 2.4v2.3M12 19.3v2.3M4.2 4.2l1.7 1.7M18.1 18.1l1.7 1.7M2.4 12h2.3M19.3 12h2.3M4.2 19.8l1.7-1.7M18.1 5.9l1.7-1.7"/></svg>
-    <svg class="moon" viewBox="0 0 24 24"><path d="M20.5 14.5A8.6 8.6 0 0 1 9.5 3.5a8.6 8.6 0 1 0 11 11z"/></svg>
-  </button>
-</div></nav>
+</div>
+
+<nav id="chapters" aria-label="Sections">
+  <a href="#top"><i>00</i>Overview</a>
+  <a href="#overview"><i>01</i>Motivation</a>
+  <a href="#method"><i>02</i>Method</a>
+  <a href="#touch"><i>03</i>Touch</a>
+  <a href="#vision"><i>04</i>Vision</a>
+  <a href="#results"><i>05</i>Results</a>
+  <a href="#hardware"><i>06</i>Hardware</a>
+  <a href="#limitations"><i>07</i>Limitations</a>
+  <a href="#qa"><i>08</i>Q&amp;A</a>
+</nav>
 
 <div class="wrap">
 
 <header id="top">
-  <h1 class="grad">VisTacAlign</h1>
-  <p class="sub">Co-Training Dexterous Policies on Tactile Human and Robot Demonstrations</p>
+  <h1><span class="name">VisTacAlign:</span> Co-Training Dexterous Policies on Tactile Human and Robot Demonstrations</h1>
   <p class="authors">Anonymous Authors</p>
   <p class="venue">Under review, ICRA 2027</p>
-  <div class="pub-links">
-    <span>Paper &middot; coming soon</span>
-    <span>Code &middot; coming soon</span>
-  </div>
 </header>
 
-<div class="hero-compare">
-  <div class="hero-splash">
-    <figure>
-      <picture class="light">
-        <source type="image/webp" srcset="static/images/splash_hero.webp">
-        <img src="static/images/splash_hero.jpg" alt="Human demonstrations with a tactile glove and robot demonstrations with a tactile hand are aligned into one co-training dataset of point clouds, tactile signals and actions; the co-trained policy reaches, grasps and lifts a drill.">
-      </picture>
-      <img class="dark" src="static/images/splash_hero.jpg" loading="lazy" alt="Human demonstrations with a tactile glove and robot demonstrations with a tactile hand are aligned into one co-training dataset of point clouds, tactile signals and actions; the co-trained policy reaches, grasps and lifts a drill.">
-    </figure>
-    <ul class="checks">
-      <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Aligned in vision, touch and kinematics</li>
-      <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>One force per finger, glove and robot</li>
-      <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Robot hand rendered into human point clouds</li>
-      <li><svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>Up to +70 points from human data</li>
-    </ul>
-  </div>
+<div class="hero">
+  <figure>
+    <picture class="light">
+      <source type="image/webp" srcset="static/images/splash_hero.webp">
+      <img src="static/images/splash_hero.jpg" alt="Human demonstrations with a tactile glove and robot demonstrations with a tactile hand are aligned into one co-training dataset of point clouds, tactile signals and actions; the co-trained policy reaches, grasps and lifts a drill.">
+    </picture>
+    <img class="dark" src="static/images/splash_hero.jpg" loading="lazy" alt="Human demonstrations with a tactile glove and robot demonstrations with a tactile hand are aligned into one co-training dataset of point clouds, tactile signals and actions; the co-trained policy reaches, grasps and lifts a drill.">
+  </figure>
+  <p>Human demonstrations are cheap, but a robot can only learn from them if they <b>look, move and feel</b> like
+  its own. VisTacAlign aligns human demonstrations to the robot in vision, touch and kinematics, so a few robot
+  demonstrations go much further on force-critical dexterous tasks.</p>
+  <ul class="checks">
+    <li>Aligned in vision, touch and kinematics</li>
+    <li>One force per finger, glove and robot</li>
+    <li>Robot hand rendered into human point clouds</li>
+    <li>Up to +70 points from human data</li>
+  </ul>
+
+  <h3>Drill: co-trained policy vs. robot-only baseline</h3>
+  <div class="pairbar"><button class="sync" type="button" data-pair="pair-hero"><svg viewBox="0 0 12 12"><path d="M2 1.5v9l8-4.5z"/></svg>Play both from start</button></div>
   <div class="rollouts" id="pair-hero">
     <div class="rollout">
       <video data-src="static/videos/drill_ours.mp4" poster="static/videos/drill_ours.jpg" muted loop playsinline preload="none" aria-label="Robot hand lifting a drill while holding the trigger, co-trained policy"></video>
@@ -378,19 +291,8 @@
       </div>
     </div>
   </div>
-  <div class="pairbar"><button class="sync" type="button" data-pair="pair-hero"><svg viewBox="0 0 12 12"><path d="M2 1.5v9l8-4.5z"/></svg>Play both from start</button></div>
   <p class="hero-cap">Drill task: grasp, pull the trigger, and lift while holding it. Adding 26 aligned human
   demonstrations raises success from <b>50%</b> to <b>70%</b>.</p>
-  <div class="ladder" aria-label="Drill success with 10 robot demonstrations, as human data is added">
-    <div class="step"><div class="v">35<small>%</small></div>
-      <div class="l"><b>10 robot demos</b>, no human data</div></div>
-    <div class="arrow" aria-hidden="true">&rarr;</div>
-    <div class="step down"><div class="v">30<small>%</small></div>
-      <div class="l"><b>+ 26 human demos</b> without touch. Worse than no human data.</div></div>
-    <div class="arrow" aria-hidden="true">&rarr;</div>
-    <div class="step up"><div class="v">55<small>%</small></div>
-      <div class="l"><b>+ the same 26</b> with aligned touch (VisTacAlign)</div></div>
-  </div>
   <div class="stats hero-stats">
     <div class="stat"><div class="v">10 <small>&rarr;</small> 80<small>%</small></div>
       <div class="l">Lego task success, robot-only vs co-trained</div></div>
@@ -406,8 +308,8 @@
 
 
 <section id="overview">
-  <div class="eyebrow">01 / Motivation</div>
-  <h2>Why human demonstrations?</h2><div class="rule"></div>
+  <div class="eyebrow">01</div>
+  <h2>Why human demonstrations?</h2>
   <div class="rollouts">
     <div class="rollout">
       <video data-src="static/videos/motiv_human_glove.mp4" poster="static/videos/motiv_human_glove.jpg" muted loop playsinline preload="none" aria-label="Human grasping a drill while wearing a tactile glove"></video>
@@ -429,8 +331,8 @@
 </section>
 
 <section id="method">
-  <div class="eyebrow">02 / Method</div>
-  <h2>How does VisTacAlign work?</h2><div class="rule"></div>
+  <div class="eyebrow">02</div>
+  <h2>How does VisTacAlign work?</h2>
   <div class="rollouts">
     <div class="rollout">
       <video data-src="static/videos/vision_pipeline.mp4" poster="static/videos/vision_pipeline.jpg" muted loop playsinline preload="none" aria-label="Visual alignment pipeline: raw capture, scene blanked with the robot hand posed, and the resulting human versus robot demonstration"></video>
@@ -450,16 +352,16 @@
 
   <div class="cards">
     <div class="card"><div class="n">Component 1</div><div class="t">Kinematic retargeting</div>
-      <p class="prose">Glove hand poses mapped to the robot hand, with a learned fingertip correction calibrated once against
+      <p>Glove hand poses mapped to the robot hand, with a learned fingertip correction calibrated once against
       a headset as pseudo ground truth.</p></div>
     <div class="card"><div class="n">Component 2</div><div class="t">Tactile alignment</div>
-      <p class="prose">A static map carries human glove forces into the robot's own taxel units, fitted from unpaired
+      <p>A static map carries human glove forces into the robot's own taxel units, fitted from unpaired
       demonstrations.</p></div>
     <div class="card"><div class="n">Component 3</div><div class="t">Visual alignment (Rp2d)</div>
-      <p class="prose">The human hand is removed and a robot-textured mesh is composited back into both stereo views, then
+      <p>The human hand is removed and a robot-textured mesh is composited back into both stereo views, then
       stereo is re-run.</p></div>
     <div class="card"><div class="n">Component 4</div><div class="t">3D-tactile transformer</div>
-      <p class="prose">A 23.5M-parameter policy over point-cloud, proprioceptive and tactile tokens, trained with consistency
+      <p>A 23.5M-parameter policy over point-cloud, proprioceptive and tactile tokens, trained with consistency
       flow matching.</p></div>
   </div>
 
@@ -476,7 +378,7 @@
   </details>
 
   <details class="more"><summary>Fixing the glove's fingertips (13.7 mm &rarr; 7.1 mm error)</summary>
-  <p class="prose">Motion-capture gloves miss pinch grasps by about a centimetre. We calibrate once against a headset's
+  <p>Motion-capture gloves miss pinch grasps by about a centimetre. We calibrate once against a headset's
   hand tracker, fitting a small network that nudges each joint by at most 20&deg; with bone lengths fixed.</p>
   <div class="tablewrap">
   <table>
@@ -498,9 +400,9 @@
 </section>
 
 <section id="touch">
-  <div class="eyebrow">03 / Touch</div>
-  <h2>How do we align touch?</h2><div class="rule"></div>
-  <p class="prose">The glove and the robot fingertips share nothing: different layout, gain and range. We reduce each to one
+  <div class="eyebrow">03</div>
+  <h2>How do we align touch?</h2>
+  <p>The glove and the robot fingertips share nothing: different layout, gain and range. We reduce each to one
   force per finger and fit a single static map that carries the human distribution onto the robot's, in the robot's
   own units. Zero contact stays zero, and the policy and robot data are never transformed.</p>
 
@@ -535,9 +437,9 @@
 </section>
 
 <section id="vision">
-  <div class="eyebrow">04 / Vision</div>
-  <h2>How do we align vision?</h2><div class="rule"></div>
-  <p class="prose">The human hand is erased from both stereo views and the robot's hand mesh, painted with real robot pixels,
+  <div class="eyebrow">04</div>
+  <h2>How do we align vision?</h2>
+  <p>The human hand is erased from both stereo views and the robot's hand mesh, painted with real robot pixels,
   is composited in its place. Stereo is then run <em>again</em>, so the inserted hand carries the same sensor noise as
   real robot point clouds instead of looking pasted in.</p>
 
@@ -564,13 +466,13 @@
 </section>
 
 <section id="results">
-  <div class="eyebrow">05 / Results</div>
-  <h2>How well does it work?</h2><div class="rule"></div>
-  <p class="prose">Three real-world tasks where success depends on force. <span class="kbd">26H10R</span> means 26 human
+  <div class="eyebrow">05</div>
+  <h2>How well does it work?</h2>
+  <p>Three real-world tasks where success depends on force. <span class="kbd">26H10R</span> means 26 human
   and 10 robot demonstrations.</p>
 
   <h3>Drill: human data helps, but only with touch</h3>
-  <p class="prose">Rollouts are at the <a href="#top">top of the page</a>. From 10 robot demonstrations, adding 26
+  <p>Rollouts are at the <a href="#top">top of the page</a>. From 10 robot demonstrations, adding 26
   <em>touchless</em> human demonstrations lowers success to <span class="c-red">30%</span>. The same demonstrations
   with aligned touch raise it to <span class="c-green">55%</span>.</p>
   <div class="chart" data-chart="drill" aria-label="Drill lift success per policy"></div>
@@ -598,7 +500,7 @@
   </details>
 
   <h3>Strawberry: touch regulates force</h3>
-  <p class="prose">Pluck a strawberry held by a magnet: hard enough to beat the magnet, gentle enough not to crush it.
+  <p>Pluck a strawberry held by a magnet: hard enough to beat the magnet, gentle enough not to crush it.
   Without touch the policy fails on large fruit entirely.</p>
   <div class="pairbar"><button class="sync" type="button" data-pair="pair-strawberry"><svg viewBox="0 0 12 12"><path d="M2 1.5v9l8-4.5z"/></svg>Play both from start</button></div>
   <div class="rollouts" id="pair-strawberry">
@@ -646,7 +548,7 @@
   </details>
 
   <h3>Lego: the recipe scales, and needs visual alignment</h3>
-  <p class="prose">Pick, align, push until it snaps, retreat. Human data takes success from <span class="c-red">10%</span>
+  <p>Pick, align, push until it snaps, retreat. Human data takes success from <span class="c-red">10%</span>
   to <span class="c-green">80%</span>, and without the visual alignment the push and retreat stages collapse.</p>
   <div class="pairbar"><button class="sync" type="button" data-pair="pair-lego"><svg viewBox="0 0 12 12"><path d="M2 1.5v9l8-4.5z"/></svg>Play both from start</button></div>
   <div class="rollouts" id="pair-lego">
@@ -695,8 +597,8 @@
 
 
 <section id="hardware">
-  <div class="eyebrow">06 / Hardware</div>
-  <h2>Hardware</h2><div class="rule"></div>
+  <div class="eyebrow">06</div>
+  <h2>Hardware</h2>
   <figure>
     <img src="static/images/hardware_overview.jpg" alt="Benchtop setup: tactile glove and wrist tracker for humans, tactile robot hand on a 7-DoF arm, stereo camera observing the workspace.">
     <figcaption><b>Setup.</b> Human demonstrations are collected with a motion-capture glove fitted with our
@@ -707,8 +609,8 @@
 </section>
 
 <section id="limitations">
-  <div class="eyebrow">07 / Limitations</div>
-  <h2>Limitations</h2><div class="rule"></div>
+  <div class="eyebrow">07</div>
+  <h2>Limitations</h2>
   <div class="limits">
     <div class="card"><div class="t">Per-task tactile map</div>
       <p>The force map is fitted per task from unpaired samples, so each new task still needs a short robot recording
@@ -725,37 +627,37 @@
 </section>
 
 <section id="qa">
-  <div class="eyebrow">08 / Q&amp;A</div>
-  <h2>Q&amp;A</h2><div class="rule"></div>
+  <div class="eyebrow">08</div>
+  <h2>Q&amp;A</h2>
 
   <details><summary>Why align in signal space instead of a learned latent space?</summary>
-  <p class="prose">Three reasons. The aligned quantity is still a per-finger force in the robot's units, so it can be checked
+  <p>Three reasons. The aligned quantity is still a per-finger force in the robot's units, so it can be checked
   directly against the robot distribution with standard statistics, which is exactly what the tables above do.
   The map is fitted once and deterministically from a few thousand unpaired frames, with one hyperparameter and
   no encoder to train. And because it is static and acts frame by frame, it cannot shift the timing of contact
   events.</p>
-  <p class="prose">We do not compare head-to-head against a learned latent alignment. Our case rests on interpretability and on
+  <p>We do not compare head-to-head against a learned latent alignment. Our case rests on interpretability and on
   guarantees that hold by construction, and quantifying that trade-off is the most immediate item of future
   work.</p></details>
 
   <details><summary>Why re-run stereo instead of just pasting the robot hand into the point cloud?</summary>
-  <p class="prose">Because a pasted mesh is not a measurement. Its points are noise-free, uniformly dense, and cover surfaces a
+  <p>Because a pasted mesh is not a measurement. Its points are noise-free, uniformly dense, and cover surfaces a
   single-view sensor could never see. A simple roughness test separates them from real sensed points almost
   perfectly, at <span class="c-red">0.99</span> area under the curve, which means a policy can learn that shortcut too. Running stereo on
   the composite drops that to <span class="c-green">0.67&ndash;0.76</span>.</p></details>
 
   <details><summary>Do you still need robot demonstrations?</summary>
-  <p class="prose">Yes. The tactile map is fitted per task from unpaired force samples, so a short robot recording of the
+  <p>Yes. The tactile map is fitted per task from unpaired force samples, so a short robot recording of the
   task's contacts is still needed. The result is not that human data replaces robot data, but that it
   substantially raises what a small number of robot demonstrations is worth.</p></details>
 
   <details><summary>How fast does the policy run?</summary>
-  <p class="prose">The policy has 23.5M parameters. At deployment, stereo runs at 20&nbsp;Hz, the glove at 60&nbsp;Hz and the
+  <p>The policy has 23.5M parameters. At deployment, stereo runs at 20&nbsp;Hz, the glove at 60&nbsp;Hz and the
   robot taxels at 30&nbsp;Hz. We sample 10 flow steps and execute the first 32 of a 64-step chunk, about 1.1
   seconds, before replanning, which takes 269&nbsp;ms on a consumer GPU.</p></details>
 
   <details><summary>Does the aligned human data change how hard the robot grips?</summary>
-  <p class="prose">That is the clearest single effect. On the strawberry task the robot-only policy under-grips small fruit and
+  <p>That is the clearest single effect. On the strawberry task the robot-only policy under-grips small fruit and
   over-grips large fruit, and <span class="c-red">never plucks</span> the largest size. The co-trained policy holds a narrow force band
   across all three sizes and <span class="c-green">succeeds on every one</span>. Grasp force is precisely the quantity the tactile alignment
   transfers from the human hand.</p></details>
@@ -802,18 +704,17 @@
     function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
     document.querySelectorAll('[data-chart]').forEach(function(el){
       var c=G[el.dataset.chart]; if(!c) return;
-      var h='<div class="groups">';
-      c.groups.forEach(function(g){
-        h+='<div class="group"><div class="bars">';
-        g.bars.forEach(function(b){
-          h+='<div class="col"><div class="bar '+b[0]+'" style="height:'+Math.max(b[2],1.5)+'%"><span class="v">'+b[2]+'</span></div></div>';
-        });
-        h+='</div><div class="labels">';
-        g.bars.forEach(function(b){ h+='<div class="col">'+esc(b[1])+'</div>'; });
-        h+='</div><div class="glabel">'+esc(g.label)+'</div></div>';
-      });
-      h+='</div><div class="legend">';
+      var h='<div class="legend">';
       c.legend.forEach(function(l){ h+='<span><i class="'+l[0]+'"></i>'+esc(l[1])+'</span>'; });
+      h+='</div><div class="groups">';
+      c.groups.forEach(function(g){
+        h+='<div class="group"><div class="glabel">'+esc(g.label)+'</div>';
+        g.bars.forEach(function(b){
+          h+='<div class="row"><div class="rl">'+esc(b[1])+'<span>'+b[2]+'%</span></div>'+
+             '<div class="track"><div class="fill '+b[0]+'" style="width:'+b[2]+'%"></div></div></div>';
+        });
+        h+='</div>';
+      });
       h+='</div><div class="axis">'+esc(c.axis)+'</div>';
       el.innerHTML=h;
     });
@@ -831,6 +732,19 @@
       });
     });
   });
+</script>
+<script>
+  (function(){
+    var links=Array.prototype.slice.call(document.querySelectorAll('#chapters a'));
+    if(!links.length || !('IntersectionObserver' in window)) return;
+    var io=new IntersectionObserver(function(es){
+      es.forEach(function(e){
+        if(!e.isIntersecting) return;
+        links.forEach(function(a){ a.classList.toggle('on', a.getAttribute('href')==='#'+e.target.id); });
+      });
+    },{rootMargin:'-20% 0px -70% 0px'});
+    links.forEach(function(a){ var t=document.getElementById(a.getAttribute('href').slice(1)); if(t) io.observe(t); });
+  })();
 </script>
 <script>
   document.getElementById('theme').addEventListener('click', function(){
