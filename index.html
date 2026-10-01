@@ -89,10 +89,6 @@
   .venue{font-size:13.5px; color:var(--muted); margin:0}
 
   .hero figure{margin:0 auto 30px; max-width:520px}
-  .hero figure img{border:0; border-radius:0; background:none}
-  .hero .dark{display:none}
-  :root[data-theme="dark"] .hero .light{display:none}
-  :root[data-theme="dark"] .hero .dark{display:block; background:#fff; border-radius:10px}
   .checks{margin:0 0 6px; padding:0 0 0 20px}
   .checks li{margin:0 0 7px; padding-left:4px}
   .checks li::marker{color:var(--accent)}
@@ -108,6 +104,13 @@
   figure{margin:24px 0 8px}
   figure img, figure video{width:100%; height:auto; display:block; border-radius:10px;
                            border:1px solid var(--line); background:#fff}
+  /* light: figures are cut-outs that sit on the page wash; dark: the opaque original on a white card,
+     since the figures' black text needs a light backdrop */
+  figure .light img, figure img.cut{border:0; border-radius:0; background:none}
+  figure .dark{display:none}
+  :root[data-theme="dark"] figure .light{display:none}
+  :root[data-theme="dark"] figure .dark{display:block}
+  :root[data-theme="dark"] figure img.cut{background:#fff; border-radius:10px}
   figure.narrow{max-width:520px; margin-left:auto; margin-right:auto}
   figure.narrow img{padding:12px}
   figcaption, .hero-cap{font-size:13px; color:var(--muted); margin-top:12px; line-height:1.65}
@@ -367,7 +370,11 @@
 
   <details class="more"><summary>The full pipeline and policy architecture</summary>
   <figure>
-    <img src="static/images/pipeline.jpg" alt="Pipeline: human and robot streams are aligned in vision, touch and kinematics, fed to a diffusion transformer, and deployed.">
+    <picture class="light">
+      <source type="image/webp" srcset="static/images/pipeline.webp">
+      <img src="static/images/pipeline.jpg" loading="lazy" alt="Pipeline: human and robot streams are aligned in vision, touch and kinematics, fed to a diffusion transformer, and deployed.">
+    </picture>
+    <img class="dark" src="static/images/pipeline.jpg" loading="lazy" alt="Pipeline: human and robot streams are aligned in vision, touch and kinematics, fed to a diffusion transformer, and deployed.">
     <figcaption><b>The co-training pipeline.</b> <em>Top:</em> human demonstrations with a tactile glove
     (<span class="c-blue">blue</span>) and teleoperated robot demonstrations (<span class="c-green">green</span>)
     become a shared co-training dataset. Each stream provides object-centric point clouds, per-finger tactile
@@ -391,7 +398,11 @@
   </table>
   </div>
   <figure>
-    <img src="static/images/pinch_correction.jpg" alt="Raw glove tracking leaves a gap between thumb and index during a pinch; the correction closes it.">
+    <picture class="light">
+      <source type="image/webp" srcset="static/images/pinch_correction.webp">
+      <img src="static/images/pinch_correction.jpg" loading="lazy" alt="Raw glove tracking leaves a gap between thumb and index during a pinch; the correction closes it.">
+    </picture>
+    <img class="dark" src="static/images/pinch_correction.jpg" loading="lazy" alt="Raw glove tracking leaves a gap between thumb and index during a pinch; the correction closes it.">
     <figcaption><b>Pinch correction.</b> Raw glove tracking (<span class="c-red">red</span>) leaves a gap between
     the thumb and index fingertips during a pinch. Our correction (<span class="c-green">green</span>) snaps the
     retargeted thumb into contact so the robot hand closes the grasp.</figcaption>
@@ -407,7 +418,11 @@
   own units. Zero contact stays zero, and the policy and robot data are never transformed.</p>
 
   <figure>
-    <img src="static/images/tactile_alignment.jpg" alt="Glove and robot taxel activations during the same drill grasp, and the mapped force distributions.">
+    <picture class="light">
+      <source type="image/webp" srcset="static/images/tactile_alignment.webp">
+      <img src="static/images/tactile_alignment.jpg" loading="lazy" alt="Glove and robot taxel activations during the same drill grasp, and the mapped force distributions.">
+    </picture>
+    <img class="dark" src="static/images/tactile_alignment.jpg" loading="lazy" alt="Glove and robot taxel activations during the same drill grasp, and the mapped force distributions.">
     <figcaption><b>Tactile alignment.</b> During the same drill grasp the glove
     (<span class="c-blue">blue</span>) and the robot hand (<span class="c-green">green</span>) produce taxel
     activations with different layouts, sensitivities and ranges (left). Each is reduced to a per-finger force
@@ -444,7 +459,11 @@
   real robot point clouds instead of looking pasted in.</p>
 
   <figure>
-    <img src="static/images/visual_alignment.jpg" alt="Both streams lifted to 3D; the human hand is replaced with a posed, coloured robot-hand mesh and re-stereoed.">
+    <picture class="light">
+      <source type="image/webp" srcset="static/images/visual_alignment.webp">
+      <img src="static/images/visual_alignment.jpg" loading="lazy" alt="Both streams lifted to 3D; the human hand is replaced with a posed, coloured robot-hand mesh and re-stereoed.">
+    </picture>
+    <img class="dark" src="static/images/visual_alignment.jpg" loading="lazy" alt="Both streams lifted to 3D; the human hand is replaced with a posed, coloured robot-hand mesh and re-stereoed.">
     <figcaption><b>Visual alignment.</b> Both streams are lifted to 3D and share the same crops. For human
     demonstrations (<span class="c-blue">blue</span>), the segmented hand is replaced by a posed robot-hand mesh,
     coloured and reprojected into the image (<span class="c-red">red</span>), so the resulting point cloud matches what
@@ -539,7 +558,7 @@
 
   <details class="more"><summary>Grip force by fruit size</summary>
   <figure class="narrow">
-    <img src="static/images/strawberry_force.svg" alt="Mean peak grasp force by fruit size: the robot-only policy under-grips small fruit and over-grips large; the co-trained policy stays near the demonstration force.">
+    <img class="cut" src="static/images/strawberry_force.svg" alt="Mean peak grasp force by fruit size: the robot-only policy under-grips small fruit and over-grips large; the co-trained policy stays near the demonstration force.">
     <figcaption><b>Mean peak grasp force</b> (thumb + index) in taxel units, for three fruit sizes, ten trials
     per size for each policy. The dashed line is the force at which the demonstrations hold the fruit. The
     robot-only policy under-grips small fruit and over-grips medium and large, while the co-trained tactile
@@ -600,7 +619,11 @@
   <div class="eyebrow">06</div>
   <h2>Hardware</h2>
   <figure>
-    <img src="static/images/hardware_overview.jpg" alt="Benchtop setup: tactile glove and wrist tracker for humans, tactile robot hand on a 7-DoF arm, stereo camera observing the workspace.">
+    <picture class="light">
+      <source type="image/webp" srcset="static/images/hardware_overview.webp">
+      <img src="static/images/hardware_overview.jpg" loading="lazy" alt="Benchtop setup: tactile glove and wrist tracker for humans, tactile robot hand on a 7-DoF arm, stereo camera observing the workspace.">
+    </picture>
+    <img class="dark" src="static/images/hardware_overview.jpg" loading="lazy" alt="Benchtop setup: tactile glove and wrist tracker for humans, tactile robot hand on a 7-DoF arm, stereo camera observing the workspace.">
     <figcaption><b>Setup.</b> Human demonstrations are collected with a motion-capture glove fitted with our
     capacitive tactile glove. Robot demonstrations use a 17-DoF tactile hand on a 7-DoF arm. Trackers on the
     glove, the camera mount and the table provide a shared frame, and a stereo camera observes the
