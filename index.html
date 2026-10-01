@@ -88,6 +88,10 @@
   .authors{font-size:15.5px; margin:0 0 4px}
   .venue{font-size:13.5px; color:var(--muted); margin:0}
 
+  /* overview video: wider than the reading column, clear of the chapter list */
+  .hero-video{display:block; width:min(880px, 100vw - 40px); height:auto; aspect-ratio:16/9; margin:0 0 40px 50%;
+              transform:translateX(-50%); border-radius:12px; background:#000}
+  @media (min-width:1180px){ .hero-video{width:min(880px, 100vw - 440px)} }
   .hero figure{margin:0 auto 30px; max-width:520px}
   .checks{margin:0 0 6px; padding:0 0 0 20px}
   .checks li{margin:0 0 7px; padding-left:4px}
@@ -259,6 +263,7 @@
 </header>
 
 <div class="hero">
+  <video class="hero-video" src="static/videos/overview.mp4" poster="static/videos/overview.jpg" autoplay muted loop playsinline controls preload="metadata" aria-label="Overview video: the co-trained policy on the drill task, how human and robot demonstrations are aligned in vision and touch, and comparisons against baselines on drill, strawberry and Lego"></video>
   <figure>
     <picture class="light">
       <source type="image/webp" srcset="static/images/splash_hero.webp">
